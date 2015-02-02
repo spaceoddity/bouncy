@@ -1,0 +1,32 @@
+<!DOCTYPE HTML>
+<meta charset="utf-8">
+<html>
+	<head>
+		<link rel="stylesheet" href="bouncy.css">
+		<script src="jquery-1.11.2.js."></script>
+		<script src="d3.js"></script>
+		<script src="hexbin.js"></script>
+		<script src="utilities.js"></script>
+		<script src="load.js"></script>
+		<script src="level.js"></script>
+		<script src="game.js"></script>
+	</head>
+	<body>
+		
+		<canvas id="canvas0"></canvas>
+		<canvas id="canvas1"></canvas>
+		<canvas id="canvas2"></canvas>		
+		
+		<div id="hexgraph_correct"></div>
+		<div id="hexgraph_incorrect"></div>
+		
+		<div id="loading" class="menu">
+			<p>Loading...</p>
+		</div>
+		<script>
+			$(document).ready(function(){
+				game.start();
+			});
+		</script>
+	</body>
+</html> 

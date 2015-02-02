@@ -1,0 +1,27 @@
+body {
+	background-color: rgb(63,63,63);
+}
+
+canvas {
+    position: absolute;
+	display: none;
+}
+
+.menu {
+	width: 800px;
+	height: 600px;
+	margin: 0 auto;	
+	z-index: 8;
+	position: relative;
+	display: none;
+	
+	justify-content: center;
+	align-items: center;
+	background: black;
+	color: white;
+}
+
+#hexgraph_correct, #hexgraph_incorrect {
+	background: white;
+	position: relative;
+}
