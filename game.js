@@ -1,19 +1,5 @@
 var game = {};
 
-game.load_layers = function() {
-	game.layers = {};
-	game.layers.canvas = {
-		canvas0 : $("#canvas0")[0],
-		canvas1 : $("#canvas1")[0],
-		canvas2 : $("#canvas2")[0],
-	};
-	game.layers.context = {
-		ctx0 : game.layers.canvas.canvas0.getContext('2d'),
-		ctx1 : game.layers.canvas.canvas1.getContext('2d'),
-		ctx2 : game.layers.canvas.canvas2.getContext('2d'),
-	};
-};
-
 game.state_manager = {
 	state_stack : [],
 	push_state : function(state) {
@@ -39,18 +25,37 @@ game.draw = function () {
 		game.state_manager.state_stack[game.state_manager.state_stack.length-1].draw();
 };
 
-game.settings = { load         : function(){ return {background : BLACK}; },
-
-				  main_menu    : function(){ return {background : BLACK}; },
-				  
-				  level		   : function(){ 
+game.settings = { level		   : function(){ 
+									
+									var blendmode;
+									var color1;
+									var color2;
+									var background;
+									
+									if (PALETTE === "purpteal") {
+										blendmode = "multiply";
+										color1 = utilities.RGB(PURPLE);
+										color2 = utilities.RGB(TEAL);
+										background = utilities.RGB(GRAY);
+									} else if (PALETTE === "redblue") {
+										blendmode = "screen";
+										color1 = utilities.RGB(RED);
+										color2 = utilities.RGB(BLUE);
+										background = utilities.RGB(BLACK);
+									}
+									
 									return {
-										separation : 0,
+										separation : 50,
 										scale : 7,
 										speed : 30, // pixels per second
 										xyratio : [1, 1],
 										rand_bounce : false,
-										rotation_speed : 90, // degrees per second
+										rotation_speed : 90, // degrees per second //TODO: add to orb
+										
+										blendmode : blendmode,
+										color1 : color1,
+										color2 : color2,
+										background : background,
 									};
 								 },
 /*				  
@@ -121,19 +126,19 @@ game.settings = { load         : function(){ return {background : BLACK}; },
 game.create_state = function(state) {
 	switch (state) {
 		case "load":
-			return new load.Load(game.layers, game.settings.load() );
-/* 		case "main_menu":
-			return new menu.MainMenu(game.layers, game.settings.main_menu() );
+			return new load.Load();
+ 		case "main_menu":
+			return new mainmenu.MainMenu();
 		case "options_menu":
-			return new optionsmenu.OptionsMenu(graphics.screens.layers, game.settings.options_menu() );
-		case "calibrate_menu":
+			return new optionsmenu.OptionsMenu();
+/*		case "calibrate_menu":
 			return new calibratemenu.CalibrateMenu(graphics.screens.layers, game.settings.calibrate_menu() );
 		case "calibrate_rb":
 			return new calibraterb.CalibrateRB(graphics.screens.layers, game.settings.calibrate_rb() );
 		case "calibrate_pt":
 			return new calibratept.CalibratePT(graphics.screens.layers, game.settings.calibrate_pt() ); */
 		case "level":
-			return new level.Level(game.layers, game.settings.level() );
+			return new level.Level(game.settings.level());
 /* 		case "pause":
 			return new pause.Pause(graphics.screens.layers);
 		case "end":
@@ -144,7 +149,6 @@ game.create_state = function(state) {
 };
 
 game.start = function () {
-	game.load_layers();
 	game.state_manager.push_state("load");
 	setInterval(game.update, 1000.0 / TICKS);
 	requestAnimationFrame(game.draw);	

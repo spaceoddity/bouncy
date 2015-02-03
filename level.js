@@ -1,8 +1,6 @@
 var level = {};
 
-level.Level = function(layers, settings) {
-	this.layer_canvas = layers.canvas;
-	this.layer_context = layers.context;
+level.Level = function(settings) {
 	this.settings = settings;
 	
 	this.answer = "";
@@ -13,75 +11,63 @@ level.Level = function(layers, settings) {
 level.Level.prototype = {
 
 	entered : function() {
-		$("#canvas0").show();
-		$("#canvas1").show();
-		$("#canvas2").show();
-		
-		this.expand();
-		this.layer_context.ctx1.globalCompositeOperation = "multiply";
-		this.clear_layers();		
-			
-		$("#hexgraph_correct").hide();
-		$("#hexgraph_incorrect").hide();
-		
-		this.set_background();
-		this.orb = new orb.Orb((document.documentElement.clientWidth - 20)/2, (document.documentElement.clientHeight - 20)/2,
+		this.get_html_elements();
+		this.show();
+		this.expand();	
+		this.choose_answer();		
+		this.orb = new orb.Orb((this.window.width())/2, (this.window.height())/2,
 							   this.settings.separation, this.settings.scale,
 							   this.settings.speed, this.settings.xyratio,
-							   this.settings.rand_bounce);
-		this.choose_answer();
+							   this.settings.rand_bounce, this.settings.color1, this.settings.color2);						   
 		this.orb.set_answer(this.answer);
 		this.orb.center();
 		this.add_listeners();
 	},
 
-	obscuring : function() {},
+	get_html_elements : function() {
+		this.window = $(window);
+		this.background = $("#level_background");
+		this.background.css("background",this.settings.background);
+		this.canvas = $("#canvas")[0];
+		this.context = this.canvas.getContext('2d');
+	},
+	
+	show : function() {
+		this.canvas.style.display = "block";
+	},
+	
+	obscuring : function() {
+		this.remove_listners();
+	},
 
-	revealed : function() {},
+	revealed : function() {
+		this.add_listeners();
+		this.show();
+	},
 
 	exiting : function() {
-		$("#canvas0").hide();
-		$("#canvas1").hide();
-		$("#canvas2").hide();
-		
-		this.contract();
+		//TODO: Exiting
 	},
 
 	update : function() {
-		this.orb.update(this.layer_canvas.canvas1);	
+		this.orb.update(this.canvas);	
 	},
 	
 	draw : function() {
-		this.clear();
-		this.orb.draw(this.layer_context.ctx1);
-	},
-	
-	clear : function() {
-		this.layer_context.ctx1.clearRect(0, 0, this.layer_canvas.canvas1.width, this.layer_canvas.canvas1.height);
-	},
-
-	clear_layers : function() {
-		for (i in this.layer_context) {
-			this.layer_context[i].clearRect(0,0, this.layer_canvas.canvas0.width, this.layer_canvas.canvas0.height);
-		}
-	},
-	
-	set_background : function() {
-		this.layer_context.ctx0.fillStyle = "rgb(127,127,127)";
-		this.layer_context.ctx0.fillRect(0,0,this.layer_canvas.canvas0.width, this.layer_canvas.canvas0.height);
-	},
-	
-	expand : function() {		
-		var width = document.documentElement.clientWidth - 20;
-		var height = document.documentElement.clientHeight - 20;
-		for (i in this.layer_canvas) {
-			this.layer_canvas[i].width = width;
-			this.layer_canvas[i].height = height;
-		}
+		var width = this.canvas.width;
+		var height = this.canvas.height;
 		
-		$("#hexgraph_correct").width(width).height(height);
-		$("#hexgraph_incorrect").width(width).height(height);
-
+		//clear
+		this.context.clearRect(0,0,width,height);
+		
+		//draw orb
+		this.orb.draw(this.context);
+	},
+	
+	expand : function() {
+		this.canvas.width = this.window.width();
+		this.canvas.height = this.window.height();
+		this.context.globalCompositeOperation = this.settings.blendmode;
 	},
 	
 /* 	contract : function() {
@@ -114,26 +100,25 @@ level.Level.prototype = {
 				this.check_answer(guessed);
 			}
 			
-			if (event.keyCode === 27) {
-				this.hexgraph();
-			}
+			//TODO: Other key acitons (esc)
 			
 		}).bind(this));
 	},
+	
+	remove_listners : function() {
+		//TODO: Remove listeners
+	},
 
-	hexgraph : function(){
-		var correct = $("#hexgraph_correct");
-		var incorrect = $("#hexgraph_incorrect");
+/*	hexgraph : function(){
+		var correct = this.hexgraph_correct;
+		var incorrect = this.hexgraph_incorrect;
 		
 		if ( correct.is(":visible") && !incorrect.is(":visible") ) {
 			correct.hide();
 			incorrect.show();
-			console.log("showing red");
 		} else if ( !correct.is(":visible") && incorrect.is(":visible") ) {
 			incorrect.hide();
-			console.log("hiding all");
 		} else {
-			console.log("showing green");
 			correct.show();
 				
 			//destroy old hex graph
@@ -146,13 +131,13 @@ level.Level.prototype = {
 			//create new incorrect hex graph----------------------------
 			this.create_new_graph("darkred","#hexgraph_incorrect", this.incorrect_guesses);
 		}
-	},
+	}, */
 	
-	create_new_graph : function(dark_color, selection, data){
+/*	create_new_graph : function(dark_color, selection, data){
 			//margins
 			var margin = {top: 0, right: 0, bottom: 0, left: 0},
-				width = document.documentElement.clientWidth - 20 - margin.left - margin.right,
-				height = document.documentElement.clientHeight - 20; - margin.top - margin.bottom;
+				width = this.window.width()*0.5 - margin.left - margin.right,
+				height = this.window.height()*0.5 - margin.top - margin.bottom;
 
 			//color scale
 			var color = d3.scale.linear()
@@ -176,8 +161,16 @@ level.Level.prototype = {
 				.attr("height", height + margin.top + margin.bottom)
 			  .append("g")
 				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-			
+				
+			svg.append("clipPath")
+				.attr("id", "clip")
+			  .append("rect")
+				.attr("class", "mesh")
+				.attr("width", width)
+				.attr("height", height);
+				
 			svg.append("g")
+			    .attr("clip-path", "url(#clip)")
 			  .selectAll(".hexagon")
 				.data(hexbin(data))
 			  .enter().append("path")
@@ -185,7 +178,7 @@ level.Level.prototype = {
 				.attr("d", hexbin.hexagon())
 				.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
 				.style("fill", function(d) { return color(d.length); });	
-	},
+	}, */
 	
 	choose_answer : function() {
 		switch(utilities.randInt(1,4)) {
@@ -207,32 +200,16 @@ level.Level.prototype = {
 	check_answer : function(guessed) {
 		if (guessed === this.answer) {
 			this.correct_guesses.push([this.orb.iris_x, this.orb.iris_y]);
-			//this.mark_correct();
 			this.choose_answer();
 			this.orb.set_answer(this.answer);
 		} else {
 			this.incorrect_guesses.push([this.orb.iris_x, this.orb.iris_y]);
-			//this.mark_incorrect();
 		}
 	},
-	
-/* 	mark_correct : function(){
-		this.layer_context.ctx2.fillStyle = "rgba(255,255,255,0.5)";
-		this.layer_context.ctx2.beginPath();
-		this.layer_context.ctx2.arc(this.orb.iris_x, this.orb.iris_y, 30, 0, 2 * Math.PI);
-		this.layer_context.ctx2.fill();
-	},
-	
-	mark_incorrect : function(){
-		this.layer_context.ctx2.fillStyle = "rgba(0,0,0,0.5)";
-		this.layer_context.ctx2.beginPath();
-		this.layer_context.ctx2.arc(this.orb.iris_x, this.orb.iris_y, 30, 0, 2 * Math.PI);
-		this.layer_context.ctx2.fill();
-	}, */
 } 
 
 orb = {};
-orb.Orb = function(center_x, center_y, separation, scale, speed, xyratio, rand_bounce){
+orb.Orb = function(center_x, center_y, separation, scale, speed, xyratio, rand_bounce, color1, color2){
 	this.center_x = center_x;
 	this.center_y = center_y;
 
@@ -250,8 +227,11 @@ orb.Orb = function(center_x, center_y, separation, scale, speed, xyratio, rand_b
 	this.speed_y = speed*xyratio[1];
 	this.rand_bounce = rand_bounce;
 	
+	this.color1 = color1;
+	this.color2 = color2;
+	
 	this.rotation_counter = 0;
-	this.rotation_speed = 90; //degrees per second
+	this.rotation_speed = 90; //degrees per second //TODO: put this in constructor, and then in settings
 };
 
 orb.Orb.prototype = {
@@ -264,8 +244,8 @@ orb.Orb.prototype = {
 	
 	draw : function(ctx){
 
-		ctx.strokeStyle = "rgb(132,0,132)";
-		ctx.fillStyle = "rgb(132,0,132)";
+		ctx.strokeStyle = this.color1;
+		ctx.fillStyle = this.color1;
 		var numberOfSides = 6;
 		var rot = this.rotation_counter * Math.PI/180;
 		
@@ -288,8 +268,8 @@ orb.Orb.prototype = {
 
 		//-------------------------------------------
 
-		ctx.strokeStyle = "rgb(0,129,129)";
-		ctx.fillStyle = "rgb(0,129,129)";
+		ctx.strokeStyle = this.color2;
+		ctx.fillStyle = this.color2;
 
 		//outer 2
 		ctx.beginPath();

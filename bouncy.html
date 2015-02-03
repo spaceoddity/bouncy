@@ -2,27 +2,43 @@
 <meta charset="utf-8">
 <html>
 	<head>
+		<link rel="stylesheet" href="jquery-ui.css">
 		<link rel="stylesheet" href="bouncy.css">
 		<script src="jquery-1.11.2.js."></script>
+		<script src="jquery-ui.js"></script>
 		<script src="d3.js"></script>
 		<script src="hexbin.js"></script>
 		<script src="utilities.js"></script>
 		<script src="load.js"></script>
+		<script src="mainmenu.js"></script>
 		<script src="level.js"></script>
 		<script src="game.js"></script>
+		<script src="optionsmenu.js"></script>
 	</head>
 	<body>
-		
-		<canvas id="canvas0"></canvas>
-		<canvas id="canvas1"></canvas>
-		<canvas id="canvas2"></canvas>		
-		
-		<div id="hexgraph_correct"></div>
-		<div id="hexgraph_incorrect"></div>
-		
-		<div id="loading" class="menu">
-			<p>Loading...</p>
+		<div id="viewport">
+			<div id="loading" class="menu">
+				<p>Loading...</p>
+			</div>
+			<div id="main_menu" class="menu">
+				<button id="start_button" type="button">Start</button>
+				<button id="options_button" type="button">Options</button>
+				<button id="calibrate_button" type="button">Calibrate Colors</button>
+				<button id="instructions_button" type="button">Instructions</button>
+			</div>
+			<div id="options_menu" class="menu">
+				<div id="palette_radio">
+					<input type="radio" id="pal_rad_1" name="pal_rad"><label for="pal_rad_1">Red Blue</label>
+					<input type="radio" id="pal_rad_2" name="pal_rad"><label for="pal_rad_2">Purple Teal</label>
+				</div>
+			</div>
+			<div id="level">
+				<div id="level_background">
+					<canvas id="canvas"></canvas>
+				</div>
+			</div>
 		</div>
+		
 		<script>
 			$(document).ready(function(){
 				game.start();

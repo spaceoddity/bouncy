@@ -1,27 +1,32 @@
 body {
 	background-color: rgb(63,63,63);
+	margin: 0px;
 }
 
 canvas {
-    position: absolute;
 	display: none;
+}
+
+#viewport {
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 .menu {
 	width: 800px;
 	height: 600px;
-	margin: 0 auto;	
-	z-index: 8;
 	position: relative;
 	display: none;
 	
+	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+	
 	background: black;
 	color: white;
 }
 
-#hexgraph_correct, #hexgraph_incorrect {
-	background: white;
-	position: relative;
+.menu button {
+	display: block;
 }
