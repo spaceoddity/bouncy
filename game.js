@@ -46,8 +46,6 @@ game.settings = { level		   : function(){
 									
 									return {
 										separation : 50,
-										scale : 7,
-										speed : 30, // pixels per second
 										xyratio : [1, 1],
 										rand_bounce : false,
 										rotation_speed : 90, // degrees per second //TODO: add to orb

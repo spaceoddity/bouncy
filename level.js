@@ -16,8 +16,8 @@ level.Level.prototype = {
 		this.expand();	
 		this.choose_answer();		
 		this.orb = new orb.Orb((this.window.width())/2, (this.window.height())/2,
-							   this.settings.separation, this.settings.scale,
-							   this.settings.speed, this.settings.xyratio,
+							   this.settings.separation,
+							   this.settings.xyratio,
 							   this.settings.rand_bounce, this.settings.color1, this.settings.color2);						   
 		this.orb.set_answer(this.answer);
 		this.orb.center();
@@ -209,22 +209,20 @@ level.Level.prototype = {
 } 
 
 orb = {};
-orb.Orb = function(center_x, center_y, separation, scale, speed, xyratio, rand_bounce, color1, color2){
+orb.Orb = function(center_x, center_y, separation, xyratio, rand_bounce, color1, color2){
 	this.center_x = center_x;
 	this.center_y = center_y;
 
 	this.separation = separation;
-	this.scale = scale;
 
-	this.outer_width = scale * 50;
-	this.outer_line_width = scale * 2;
-	this.iris_width = scale * 20;
-	this.iris_line_width = scale * 3;
-	this.pupil_width = scale * 4;
+	this.outer_width = ORB_SCALE * ORB_WIDTH;
+	this.outer_line_width = ORB_SCALE * ORB_LINE_WIDTH;
+	this.iris_width = ORB_SCALE * ORB_IRIS_WIDTH;
+	this.iris_line_width = ORB_SCALE * ORB_IRIS_LINE_WIDTH;
+	this.pupil_width = ORB_SCALE * ORB_PUPIL_WIDTH;
 	
-	this.speed = speed;
-	this.speed_x = speed*xyratio[0];
-	this.speed_y = speed*xyratio[1];
+	this.speed_x = ORB_SPEED*xyratio[0];
+	this.speed_y = ORB_SPEED*xyratio[1];
 	this.rand_bounce = rand_bounce;
 	
 	this.color1 = color1;
@@ -298,11 +296,11 @@ orb.Orb.prototype = {
 	
 	random_bounce : function(axis) {
 		if (axis === "x") {
-			this.speed_x = (this.speed_x > 0) ? -this.speed : this.speed;
-			this.speed_y = (Math.random >= 0.5) ? -Math.random()*this.speed : Math.random()*this.speed;
+			this.speed_x = (this.speed_x > 0) ? -ORB_SPEED : ORB_SPEED;
+			this.speed_y = (Math.random >= 0.5) ? -Math.random()*ORB_SPEED : Math.random()*ORB_SPEED;
 		} else if (axis === "y") {
-			this.speed_x = (Math.random() >= 0.5) ? -Math.random()*this.speed : Math.random()*this.speed;			
-			this.speed_y = (this.speed_y > 0) ? -this.speed : this.speed;		
+			this.speed_x = (Math.random() >= 0.5) ? -Math.random()*ORB_SPEED : Math.random()*ORB_SPEED;			
+			this.speed_y = (this.speed_y > 0) ? -ORB_SPEED : ORB_SPEED;		
 		}
 	},
 	
@@ -376,12 +374,12 @@ orb.Orb.prototype = {
 
 		this.random_iris();
 		
-		this.pupil_x = this.iris_x + (x_offset * this.scale);
-		this.pupil_y = this.iris_y + (y_offset * this.scale);
+		this.pupil_x = this.iris_x + (x_offset * ORB_SCALE);
+		this.pupil_y = this.iris_y + (y_offset * ORB_SCALE);
 	},
 
 	random_iris : function() {
-		this.iris_x = this.center_x + utilities.randInt((-7)*this.scale, 7*this.scale);
-		this.iris_y = this.center_y + utilities.randInt((-7)*this.scale, 7*this.scale);
+		this.iris_x = this.center_x + utilities.randInt((-7)*ORB_SCALE, 7*ORB_SCALE);
+		this.iris_y = this.center_y + utilities.randInt((-7)*ORB_SCALE, 7*ORB_SCALE);
 	},
 };
