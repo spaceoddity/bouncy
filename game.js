@@ -45,7 +45,6 @@ game.settings = { level		   : function(){
 									}
 									
 									return {
-										separation : 50,
 										xyratio : [1, 1],
 										rand_bounce : false,
 										rotation_speed : 90, // degrees per second //TODO: add to orb
@@ -147,6 +146,7 @@ game.create_state = function(state) {
 };
 
 game.start = function () {
+	//$('.ui-spinner-button').click(function() { $(this).siblings('input').change(); });
 	game.state_manager.push_state("load");
 	setInterval(game.update, 1000.0 / TICKS);
 	requestAnimationFrame(game.draw);	

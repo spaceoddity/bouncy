@@ -10,7 +10,9 @@ var ORB_IRIS_WIDTH = 20;
 var ORB_IRIS_LINE_WIDTH = 3;
 var ORB_PUPIL_WIDTH = 4;
 var ORB_SPEED_STEP = 20;
+var ORB_SCALE_STEP = 15;
 
+var ORB_SEPARATION = 60;
 var ORB_SCALE = 7;
 var ORB_SPEED = 60; //pixels per second
 var PALETTE = "purpteal";  // purpteal, redblue

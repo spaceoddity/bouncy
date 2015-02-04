@@ -16,7 +16,6 @@ level.Level.prototype = {
 		this.expand();	
 		this.choose_answer();		
 		this.orb = new orb.Orb((this.window.width())/2, (this.window.height())/2,
-							   this.settings.separation,
 							   this.settings.xyratio,
 							   this.settings.rand_bounce, this.settings.color1, this.settings.color2);						   
 		this.orb.set_answer(this.answer);
@@ -209,11 +208,9 @@ level.Level.prototype = {
 } 
 
 orb = {};
-orb.Orb = function(center_x, center_y, separation, xyratio, rand_bounce, color1, color2){
+orb.Orb = function(center_x, center_y, xyratio, rand_bounce, color1, color2){
 	this.center_x = center_x;
 	this.center_y = center_y;
-
-	this.separation = separation;
 
 	this.outer_width = ORB_SCALE * ORB_WIDTH;
 	this.outer_line_width = ORB_SCALE * ORB_LINE_WIDTH;
@@ -234,7 +231,7 @@ orb.Orb = function(center_x, center_y, separation, xyratio, rand_bounce, color1,
 
 orb.Orb.prototype = {
 	center : function(){
-		var adjustment = (this.separation / 2) * (-1);
+		var adjustment = (ORB_SEPARATION / 2) * (-1);
 		this.center_x += adjustment;
 		this.iris_x += adjustment;
 		this.pupil_x += adjustment;
@@ -271,10 +268,10 @@ orb.Orb.prototype = {
 
 		//outer 2
 		ctx.beginPath();
-		ctx.moveTo((this.center_x + this.separation) + this.outer_width/2 * Math.cos(0 + rot), this.center_y + this.outer_width/2 *  Math.sin(0 + rot));          
+		ctx.moveTo((this.center_x + ORB_SEPARATION) + this.outer_width/2 * Math.cos(0 + rot), this.center_y + this.outer_width/2 *  Math.sin(0 + rot));          
 		 
 		for (i = 1; i <= numberOfSides;i += 1) {
-			ctx.lineTo ((this.center_x + this.separation) + this.outer_width/2 * Math.cos(i * 2 * Math.PI / numberOfSides + rot ), this.center_y + this.outer_width/2 * Math.sin(i * 2 * Math.PI / numberOfSides + rot));
+			ctx.lineTo ((this.center_x + ORB_SEPARATION) + this.outer_width/2 * Math.cos(i * 2 * Math.PI / numberOfSides + rot ), this.center_y + this.outer_width/2 * Math.sin(i * 2 * Math.PI / numberOfSides + rot));
 		}
 		
 		ctx.lineWidth = this.outer_line_width;
@@ -282,7 +279,7 @@ orb.Orb.prototype = {
 
 		//pupil 2
 		ctx.beginPath();
-		ctx.arc(this.pupil_x + this.separation, this.pupil_y, this.pupil_width/2, 0, 2 * Math.PI);
+		ctx.arc(this.pupil_x + ORB_SEPARATION, this.pupil_y, this.pupil_width/2, 0, 2 * Math.PI);
 		ctx.fill();
 	},
 
@@ -317,8 +314,8 @@ orb.Orb.prototype = {
 	
 	check_bounds : function(canvas) {
 		var radius = ((this.outer_width/2)+this.outer_line_width/2);
-		if (this.separation >= 0) {
-			if (this.center_x + this.speed_x/TICKS + radius + this.separation >= canvas.width || this.center_x + this.speed_x/TICKS - radius  <= 0 ) {
+		if (ORB_SEPARATION >= 0) {
+			if (this.center_x + this.speed_x/TICKS + radius + ORB_SEPARATION >= canvas.width || this.center_x + this.speed_x/TICKS - radius  <= 0 ) {
 				if (this.rand_bounce) {
 					this.random_bounce("x");
 				} else {
@@ -326,7 +323,7 @@ orb.Orb.prototype = {
 				}
 			}		
 		} else {
-			if (this.center_x + this.speed_x/TICKS + radius  >= canvas.width || this.center_x + this.speed_x/TICKS - radius + this.separation  <= 0 ) {
+			if (this.center_x + this.speed_x/TICKS + radius  >= canvas.width || this.center_x + this.speed_x/TICKS - radius + ORB_SEPARATION  <= 0 ) {
 				if (this.rand_bounce) {
 					this.random_bounce("x");
 				} else {
