@@ -4,6 +4,7 @@ body {
 }
 
 #viewport {
+	position: relative;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -29,13 +30,20 @@ body {
 }
 
 /* Options Menu */
-#inner_options {
-	background: none;
-	border: 1px solid white;
+#options_menu {
+	height: auto;
+	width: auto;
 }
 
 #options_canvas {
-	position: fixed;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+}
+
+#inner_options {
+	background: none;
+	border: 1px solid white;
 }
 
 .verg_opt {

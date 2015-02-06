@@ -142,7 +142,12 @@ game.create_state = function(state) {
 };
 
 game.start = function () {
-	//$('.ui-spinner-button').click(function() { $(this).siblings('input').change(); });
+	$.widget( "ui.minute_spinner", $.ui.spinner, {
+		_format: function(value) { return value + ' min'; },
+
+		_parse: function(value) { return parseInt(value); }
+	});
+	
 	game.state_manager.push_state("load");
 	setInterval(game.update, 1000.0 / TICKS);
 	requestAnimationFrame(game.draw);	
