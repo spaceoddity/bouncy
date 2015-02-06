@@ -29,26 +29,34 @@
 				<button id="instructions_button" type="button">Instructions</button>
 			</div>
 			<div id="options_menu" class="menu">
-				
-				<div id="palette_radio">
-					<input type="radio" id="pal_rad_1" name="pal_rad"><label for="pal_rad_1">Red Blue</label>
-					<input type="radio" id="pal_rad_2" name="pal_rad"><label for="pal_rad_2">Purple Teal</label>
+				<canvas id="options_canvas"></canvas>
+				<div id="inner_options" class="menu">
+					<div id="palette_radio">
+						<input type="radio" id="pal_rad_1" name="pal_rad"><label for="pal_rad_1">Red Blue</label>
+						<input type="radio" id="pal_rad_2" name="pal_rad"><label for="pal_rad_2">Purple Teal</label>
+					</div>
+					
+					<div id="bounce_radio">
+						<input type="radio" id="bounce_rad_1" name="bounce_rad"><label for="bounce_rad_1"><img src="bounce-1.png"></label>
+						<input type="radio" id="bounce_rad_2" name="bounce_rad"><label for="bounce_rad_2"><img src="bounce-2.png"></label>
+						<input type="radio" id="bounce_rad_3" name="bounce_rad"><label for="bounce_rad_3"><img src="bounce-3.png"></label>
+					</div>
+					
+					<div>
+						<label for="size_spinner">Size:</label>
+						<input readonly id="size_spinner" name="value">
+					</div>
+					
+					<div>
+						<label for="speed_spinner">Speed:</label>
+						<input readonly id="speed_spinner" name="value">
+					</div>
+					
+					<div id="vergence_label" class="verg_opt"> <span>Divergence</span> <span>Convergence</span> </div>
+					<div id="vergence_slider" class="verg_opt"></div>
+					
+					<button id="options_back_button" type="button">Back</button>
 				</div>
-				
-				<div>
-					<label for="size_spinner">Size:</label>
-					<input readonly id="size_spinner" name="value">
-				</div>
-				
-				<div>
-					<label for="speed_spinner">Speed:</label>
-					<input readonly id="speed_spinner" name="value">
-				</div>
-				
-				<div id="vergence_label" class="verg_opt"> <span>Divergence</span> <span>Convergence</span> </div>
-				<div id="vergence_slider" class="verg_opt"></div>
-				
-				<button id="options_back_button" type="button">Back</button>
 			</div>
 			<div id="level">
 				<div id="level_background">

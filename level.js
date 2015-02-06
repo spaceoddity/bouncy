@@ -1,5 +1,5 @@
 var level = {};
-
+//TODO: Pass colors through draw, not constructor
 level.Level = function(settings) {
 	this.settings = settings;
 	
@@ -12,12 +12,11 @@ level.Level.prototype = {
 
 	entered : function() {
 		this.get_html_elements();
-		this.show();
-		this.expand();	
+		this.expand();
+		this.level.show();		
 		this.choose_answer();		
 		this.orb = new orb.Orb((this.window.width())/2, (this.window.height())/2,
-							   this.settings.xyratio,
-							   this.settings.rand_bounce, this.settings.color1, this.settings.color2);						   
+							   this.settings.color1, this.settings.color2);						   
 		this.orb.set_answer(this.answer);
 		this.orb.center();
 		this.add_listeners();
@@ -25,27 +24,25 @@ level.Level.prototype = {
 
 	get_html_elements : function() {
 		this.window = $(window);
+		this.body = $('body');
+		this.level = $("#level");
 		this.background = $("#level_background");
 		this.background.css("background",this.settings.background);
 		this.canvas = $("#canvas")[0];
 		this.context = this.canvas.getContext('2d');
 	},
-	
-	show : function() {
-		this.canvas.style.display = "block";
-	},
-	
+		
 	obscuring : function() {
 		this.remove_listners();
 	},
 
 	revealed : function() {
 		this.add_listeners();
-		this.show();
 	},
 
 	exiting : function() {
-		//TODO: Exiting
+		this.remove_listners();
+		this.level.hide();
 	},
 
 	update : function() {
@@ -69,7 +66,7 @@ level.Level.prototype = {
 		this.context.globalCompositeOperation = this.settings.blendmode;
 	},
 	
-/* 	contract : function() {
+/* 	contract : function() { //TODO: Contract
 		for (i in this.layer_canvas) {
 			this.layer_canvas[i].width = 800;
 			this.layer_canvas[i].canvas.height = 600;
@@ -79,7 +76,7 @@ level.Level.prototype = {
 	}, */
 
 	add_listeners : function() {
-		$('body').on('keyup', (function(event){
+		this.body.on('keyup', (function(event){
 			var guessed = "";
 			switch(event.keyCode) {
 				case 38:
@@ -99,13 +96,15 @@ level.Level.prototype = {
 				this.check_answer(guessed);
 			}
 			
-			//TODO: Other key acitons (esc)
+			if (event.keyCode === 27) {
+				game.state_manager.pop_state();
+			}
 			
 		}).bind(this));
 	},
 	
 	remove_listners : function() {
-		//TODO: Remove listeners
+		this.body.off('keyup');		
 	},
 
 /*	hexgraph : function(){
@@ -208,7 +207,7 @@ level.Level.prototype = {
 } 
 
 orb = {};
-orb.Orb = function(center_x, center_y, xyratio, rand_bounce, color1, color2){
+orb.Orb = function(center_x, center_y, color1, color2){
 	this.center_x = center_x;
 	this.center_y = center_y;
 
@@ -218,15 +217,13 @@ orb.Orb = function(center_x, center_y, xyratio, rand_bounce, color1, color2){
 	this.iris_line_width = ORB_SCALE * ORB_IRIS_LINE_WIDTH;
 	this.pupil_width = ORB_SCALE * ORB_PUPIL_WIDTH;
 	
-	this.speed_x = ORB_SPEED*xyratio[0];
-	this.speed_y = ORB_SPEED*xyratio[1];
-	this.rand_bounce = rand_bounce;
+	this.speed_x = ORB_SPEED*ORB_BOUNCE[0];
+	this.speed_y = ORB_SPEED*ORB_BOUNCE[1];
 	
 	this.color1 = color1;
 	this.color2 = color2;
 	
 	this.rotation_counter = 0;
-	this.rotation_speed = 90; //degrees per second //TODO: put this in constructor, and then in settings
 };
 
 orb.Orb.prototype = {
@@ -291,7 +288,7 @@ orb.Orb.prototype = {
 		}
 	},
 	
-	random_bounce : function(axis) {
+/* 	random_bounce : function(axis) {
 		if (axis === "x") {
 			this.speed_x = (this.speed_x > 0) ? -ORB_SPEED : ORB_SPEED;
 			this.speed_y = (Math.random >= 0.5) ? -Math.random()*ORB_SPEED : Math.random()*ORB_SPEED;
@@ -299,12 +296,12 @@ orb.Orb.prototype = {
 			this.speed_x = (Math.random() >= 0.5) ? -Math.random()*ORB_SPEED : Math.random()*ORB_SPEED;			
 			this.speed_y = (this.speed_y > 0) ? -ORB_SPEED : ORB_SPEED;		
 		}
-	},
+	}, */
 	
 	update : function(canvas) {
 		this.check_bounds(canvas);
 		
-		this.rotation_counter += this.rotation_speed/TICKS;
+		this.rotation_counter += ORB_ROTATION_SPEED/TICKS;
 		if (this.rotation_counter >= 360) {
 			this.rotation_counter -= 360;
 		}
@@ -316,28 +313,16 @@ orb.Orb.prototype = {
 		var radius = ((this.outer_width/2)+this.outer_line_width/2);
 		if (ORB_SEPARATION >= 0) {
 			if (this.center_x + this.speed_x/TICKS + radius + ORB_SEPARATION >= canvas.width || this.center_x + this.speed_x/TICKS - radius  <= 0 ) {
-				if (this.rand_bounce) {
-					this.random_bounce("x");
-				} else {
-					this.bounce("x");
-				}
-			}		
+				this.bounce("x");
+			}
 		} else {
 			if (this.center_x + this.speed_x/TICKS + radius  >= canvas.width || this.center_x + this.speed_x/TICKS - radius + ORB_SEPARATION  <= 0 ) {
-				if (this.rand_bounce) {
-					this.random_bounce("x");
-				} else {
-					this.bounce("x");
-				}
+				this.bounce("x");
 			}		
 		}
 
 		if (this.center_y + this.speed_y/TICKS + radius >= canvas.height || this.center_y + this.speed_y/TICKS - radius <= 0) {
-			if (this.rand_bounce) {
-				this.random_bounce("y");
-			} else {
-				this.bounce("y");
-			}
+			this.bounce("y");
 		}	
 	},
 	

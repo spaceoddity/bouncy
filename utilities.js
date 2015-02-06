@@ -11,10 +11,13 @@ var ORB_IRIS_LINE_WIDTH = 3;
 var ORB_PUPIL_WIDTH = 4;
 var ORB_SPEED_STEP = 20;
 var ORB_SCALE_STEP = 15;
+var ORB_ROTATION_SPEED = 90; //degrees per second
 
+var ORB_BOUNCE_VALUES = {NORMAL: [1,1], HORIZONTAL: [1,0.1], VERTICAL: [0.1,1]}
 var ORB_SEPARATION = 60;
 var ORB_SCALE = 7;
 var ORB_SPEED = 60; //pixels per second
+var ORB_BOUNCE = ORB_BOUNCE_VALUES.NORMAL;
 var PALETTE = "purpteal";  // purpteal, redblue
 var PURPLE = [132,0,132];
 var TEAL = [0,129,129];

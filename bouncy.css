@@ -3,14 +3,15 @@ body {
 	margin: 0px;
 }
 
-canvas {
-	display: none;
-}
-
 #viewport {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	overflow: hidden;
+}
+
+#level {
+	display: none;
 }
 
 .menu {
@@ -25,6 +26,16 @@ canvas {
 	
 	background: black;
 	color: white;
+}
+
+/* Options Menu */
+#inner_options {
+	background: none;
+	border: 1px solid white;
+}
+
+#options_canvas {
+	position: fixed;
 }
 
 .verg_opt {
