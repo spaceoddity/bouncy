@@ -1,56 +1,161 @@
 body {
-	background-color: rgb(63,63,63);
 	margin: 0px;
 }
 
 #viewport {
+	background-color: rgb(63,63,63);	
 	position: relative;
-	display: flex;
-	justify-content: center;
-	align-items: center;
 	overflow: hidden;
-}
-
-#level {
-	display: none;
-}
-
-.menu {
-	width: 800px;
-	height: 600px;
-	position: relative;
-	display: none;
-	
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	
-	background: black;
+	font-family: Arial,sans-serif;	
+	font-size: 18px;
 	color: white;
 }
 
-/* Options Menu */
-#options_menu {
-	height: auto;
-	width: auto;
+.ui-button .ui-button-text {
+	font-size: 18px;
 }
 
-#options_canvas {
+.column_center {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.row_center {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+}
+
+.hidden {
+	display: none;
+}
+
+.space-between {
+	display: flex;
+	justify-content: space-between; 
+}
+
+.bg_canvas {
 	position: absolute;
 	top: 0px;
 	left: 0px;
 }
 
-#inner_options {
-	background: none;
-	border: 1px solid white;
+.rounded {
+	border-radius: 5px;
 }
 
-.verg_opt {
-	width: 500px;
+.marginned {
+	margin: 10px;
 }
 
-#vergence_label {
+.padded {
+	padding: 10px;
+}
+
+.floating_bg {
+	z-index: 1;
+	background: rgba(255,255,255,0.25);
+}
+
+/* Options Menu */
+#vergence {
+	border: 1px solid rgba(255,255,255, 0.25);
+	padding: 6px 6px 0px 6px;
+}
+
+.options_border {
+	border: 1px solid rgba(255,255,255, 0.25);
+	padding: 6px;
+}
+
+.options_radio div {
+	display: inline-block;
+}
+
+#palette_radio label span, #bounce_radio label span {
+	padding: 0.4em 0.6em 0.2em 0.6em;
+}
+
+#rb_button {
+  height: 41px;
+  width: 41px;
+  background-image: linear-gradient(
+						to top right, 
+						rgb(255,0,0), 
+						rgb(0, 0, 0), 
+						rgb(0,0,255)
+    );
+}
+
+#pt_button {
+  height: 41px;
+  width: 41px;
+  background-image: linear-gradient(
+						to top right, 
+						rgb(127,0,127), 
+						rgb(127, 127, 127), 
+						rgb(0,127,127)
+    );
+}
+
+#rg_button {
+  height: 41px;
+  width: 41px;
+  background-image: linear-gradient(
+						to top right, 
+						rgb(255,0,0), 
+						rgb(255, 127, 0), 
+						rgb(0,127,0)
+    );
+}
+
+.options_spinner {
+	padding-left: 15px;
+}
+
+.big_spin {
+	width: 80px;
+}
+
+.small_spin {
+	width: 50px;
+}
+
+.options_width {
+	width: 550px;
+}
+
+/*------------------------------------------------------------*/
+
+#countdown {
+	position: fixed;
+	top: 0;
+	right: 0;
+	font-size: 32px;
+	padding: 18px;
+	color: rgba(255,255,255,0.5)
+}
+
+#pause_buttons {
 	display: flex;
-	justify-content: space-between; 
+	justify-content: flex-end;
+}
+
+#pause_buttons button {
+	margin-top: 6px;
+	margin-left: 6px;
+}
+
+.hexagon {
+  fill: none;
+  stroke: gray;
+  stroke-width: .5px;
+}
+
+.hexgraph {
+	background: white;
 }

@@ -13,23 +13,32 @@ level.Level.prototype = {
 	entered : function() {
 		this.get_html_elements();
 		this.expand();
-		this.level.show();		
+		this.level.css("display","flex");		
 		this.choose_answer();		
 		this.orb = new orb.Orb((this.window.width())/2, (this.window.height())/2,
 							   this.settings.color1, this.settings.color2);						   
 		this.orb.set_answer(this.answer);
 		this.orb.center();
 		this.add_listeners();
+		this.elapsed = 0;
 	},
 
 	get_html_elements : function() {
 		this.window = $(window);
 		this.body = $('body');
 		this.level = $("#level");
-		this.background = $("#level_background");
-		this.background.css("background",this.settings.background);
+		this.level.css("background",this.settings.background);
 		this.canvas = $("#canvas")[0];
 		this.context = this.canvas.getContext('2d');
+		this.countdown = $("#countdown");
+		
+		this.pause = $("#pause")
+		$("#pause_tabs").tabs();
+		this.hits_graph = $("#hits_graph");
+		this.misses_graph = $("#misses_graph");
+		
+		this.resume_button = $("#resume_button").button().button("enable");
+		this.quit_button = $("#quit_button").button();
 	},
 		
 	obscuring : function() {
@@ -46,7 +55,10 @@ level.Level.prototype = {
 	},
 
 	update : function() {
-		this.orb.update(this.canvas);	
+		if (this.pause.is(":hidden")) {
+			this.orb.update(this.canvas);
+			this.update_countdown();
+		}
 	},
 	
 	draw : function() {
@@ -61,20 +73,29 @@ level.Level.prototype = {
 	},
 	
 	expand : function() {
+		this.level.width(this.window.width());
+		this.level.height(this.window.height());		
 		this.canvas.width = this.window.width();
 		this.canvas.height = this.window.height();
 		this.context.globalCompositeOperation = this.settings.blendmode;
 	},
-	
-/* 	contract : function() { //TODO: Contract
-		for (i in this.layer_canvas) {
-			this.layer_canvas[i].width = 800;
-			this.layer_canvas[i].canvas.height = 600;
-		}
-		$("#container").width(800);
-		$("#container").width(600);	
-	}, */
 
+	update_countdown : function() {
+		this.elapsed += 1;
+
+		var remaining = (GAME_LENGTH*60) - (this.elapsed/TICKS);
+		
+		var minutes = Math.floor(remaining/60);
+		var seconds = Math.floor(remaining%60);
+		this.countdown.html(minutes + ":" + ("0"+seconds).slice(-2));		
+		
+		if (this.elapsed/TICKS >= GAME_LENGTH*60) {
+			this.pause.show();
+			this.resume_button.button("disable");
+			this.body.off('keyup');
+		}
+	},
+	
 	add_listeners : function() {
 		this.body.on('keyup', (function(event){
 			var guessed = "";
@@ -95,88 +116,97 @@ level.Level.prototype = {
 			if (guessed.length > 0) {
 				this.check_answer(guessed);
 			}
-			
 			if (event.keyCode === 27) {
-				game.state_manager.pop_state();
+				this.pause.toggle();
+				if (this.pause.is(":visible")) {
+					this.create_graphs();
+				}
 			}
-			
+		}).bind(this));
+		
+		this.resume_button.on("click", (function(){this.pause.toggle();}).bind(this));
+		this.quit_button.on("click", (function(){
+			this.pause.toggle();
+			game.state_manager.pop_state();
 		}).bind(this));
 	},
 	
 	remove_listners : function() {
-		this.body.off('keyup');		
+		this.body.off('keyup');
+		this.resume_button.off("click");
+		this.quit_button.off("click");
 	},
 
-/*	hexgraph : function(){
-		var correct = this.hexgraph_correct;
-		var incorrect = this.hexgraph_incorrect;
+	create_graphs : function(){
+		//destroy old hex graph
+		this.hits_graph.empty();
+		this.misses_graph.empty();
 		
-		if ( correct.is(":visible") && !incorrect.is(":visible") ) {
-			correct.hide();
-			incorrect.show();
-		} else if ( !correct.is(":visible") && incorrect.is(":visible") ) {
-			incorrect.hide();
-		} else {
-			correct.show();
-				
-			//destroy old hex graph
-			correct.empty();
-			incorrect.empty();
+		
+		//create new correct hex graph------------------------------
+		this.hex_graph("darkgreen","#hits_graph", this.correct_guesses);
+		
+		//create new incorrect hex graph----------------------------
+		this.hex_graph("darkred","#misses_graph", this.incorrect_guesses);
+	},
+
+	hex_graph : function(color, id, data) {
+		var graph_width = this.window.width()*0.50;
+		var graph_height = this.window.height()*0.50;
+		
+		var data_width = this.window.width();
+		var data_height = this.window.height();
+
+		var x = d3.scale.linear()
+			.domain([0, data_width])
+			.range([0, graph_width]);
+
+		var y = d3.scale.linear()
+			.domain([0, data_height])
+			.range([0, graph_height]);		
+
+		var points = data.map(function(xy){
+				return [x(xy[0]),y(xy[1])];
+		});
+
+		var color = d3.scale.linear()
+			.domain([0, 3])
+			.range(["white", color])
+			.interpolate(d3.interpolateLab);
+
+		var hexbin = d3.hexbin()
+			.size([graph_width, graph_height])
+			.radius(25);
+
+		var svg = d3.select(id).append("svg")
+			.attr("width", graph_width)
+			.attr("height", graph_height)
+		  .append("g");
+
+		svg.append("clipPath")
+			.attr("id", "clip")
+		  .append("rect")
+			.attr("class", "mesh")
+			.attr("width", graph_width)
+			.attr("height", graph_height);
 			
-			//create new correct hex graph------------------------------
-			this.create_new_graph("darkgreen","#hexgraph_correct", this.correct_guesses);
-			
-			//create new incorrect hex graph----------------------------
-			this.create_new_graph("darkred","#hexgraph_incorrect", this.incorrect_guesses);
-		}
-	}, */
-	
-/*	create_new_graph : function(dark_color, selection, data){
-			//margins
-			var margin = {top: 0, right: 0, bottom: 0, left: 0},
-				width = this.window.width()*0.5 - margin.left - margin.right,
-				height = this.window.height()*0.5 - margin.top - margin.bottom;
+		svg.append("g")
+			.attr("clip-path", "url(#clip)")
+		  .selectAll(".hexagon")
+			.data(hexbin(points))
+		  .enter().append("path")
+			.attr("class", "hexagon")
+			.attr("d", hexbin.hexagon())
+			.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+			.style("fill", function(d) { return color(d.length); });
 
-			//color scale
-			var color = d3.scale.linear()
-				.domain([0, 4]) //what comes in. number of things in the bin
-				.range(["white", dark_color]) //what gets spit out, a color, light to dark
-				.interpolate(d3.interpolateLab);				
-
-			var hexbin = d3.hexbin()
-				.size([width, height])
-				.radius(30);
-				
-			// an identity scale is when... domain and range are identical... ?
-			var x = d3.scale.identity()
-				.domain([0, width]);
-
-			var y = d3.scale.identity()
-				.domain([0, height]);
-				
-			var svg = d3.select(selection).append("svg")
-				.attr("width", width + margin.left + margin.right)
-				.attr("height", height + margin.top + margin.bottom)
-			  .append("g")
-				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-				
-			svg.append("clipPath")
-				.attr("id", "clip")
-			  .append("rect")
-				.attr("class", "mesh")
-				.attr("width", width)
-				.attr("height", height);
-				
-			svg.append("g")
-			    .attr("clip-path", "url(#clip)")
-			  .selectAll(".hexagon")
-				.data(hexbin(data))
-			  .enter().append("path")
-				.attr("class", "hexagon")
-				.attr("d", hexbin.hexagon())
-				.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-				.style("fill", function(d) { return color(d.length); });	
-	}, */
+		svg.append("svg:path")
+			.attr("clip-path", "url(#clip)")
+            .attr("d",hexbin.mesh())
+            .style("stroke-width", 0.1)
+            .style("stroke", "gray")
+            .style("fill", "none");			
+	},
 	
 	choose_answer : function() {
 		switch(utilities.randInt(1,4)) {

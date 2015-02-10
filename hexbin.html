@@ -1,99 +1,26 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
 <style>
-
-<!-- .axis text {
-  font: 10px sans-serif;
-}
-
-.axis path,
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-} -->
-
-.hexagon {
-  fill: none;
-  stroke: rgb(255,255,255);
-  stroke-width: 0px;
-}
-
 </style>
 <body>
-<script src="d3.js"></script>
-<script src="hexbin.js"></script>
-<script>
+	<canvas id="mycanvas" height=300 width=300></canvas>
+	<script>
+var canvas = document.getElementById("mycanvas");
+var ctx = canvas.getContext("2d");
 
-//margins
-var margin = {top: 20, right: 20, bottom: 30, left: 40},
-    width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
-
-//data points, array of x,y coordinates
-var randomX = d3.random.normal(width / 2, 80),
-    randomY = d3.random.normal(height / 2, 80),
-    points = d3.range(2000).map(function() { return [randomX(), randomY()]; });
-
-//color scale
-var color = d3.scale.linear()
-    .domain([0, 20]) //what comes in. number of things in the bin
-    .range(["white", "steelblue"]) //what gets spit out, a color, light to dark
-    .interpolate(d3.interpolateLab);
-
-var hexbin = d3.hexbin()
-    .size([width, height])
-    .radius(20);
-
-// an identity scale is when... domain and range are identical... ?
-var x = d3.scale.identity()
-    .domain([0, width]);
-
-// this looks the same as the above, but switched so that y starts at 0 at the bottom
-var y = d3.scale.linear()
-    .domain([0, height])
-    .range([height, 0]);
-
-/*var xAxis = d3.svg.axis()
-    .scale(x)
-    .orient("bottom")
-    .tickSize(6, -height);
-
-var yAxis = d3.svg.axis()
-    .scale(y)
-    .orient("left")
-    .tickSize(6, -width); */
-
-var svg = d3.select("body").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-/* svg.append("clipPath")
-    .attr("id", "clip")
-  .append("rect")
-    .attr("class", "mesh")
-    .attr("width", width)
-    .attr("height", height); */
-
-svg.append("g")
-    //.attr("clip-path", "url(#clip)")
-  .selectAll(".hexagon")
-    .data(hexbin(points))
-  .enter().append("path")
-    .attr("class", "hexagon")
-    .attr("d", hexbin.hexagon())
-    .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-    .style("fill", function(d) { return color(d.length); });
-
-//svg.append("g")
-//    .attr("class", "y axis")
-//    .call(yAxis);
-
-//svg.append("g")
-//    .attr("class", "x axis")
-//    .attr("transform", "translate(0," + height + ")")
-//    .call(xAxis);
-
-</script>
+var numberOfSides = 6,
+	size = 20,
+	Xcenter = 25,
+	Ycenter = 25;
+ 
+ctx.beginPath();
+ctx.moveTo (Xcenter +  size * Math.cos(0), Ycenter +  size *  Math.sin(0));          
+ 
+for (var i = 1; i <= numberOfSides;i += 1) {
+	ctx.lineTo (Xcenter + size * Math.cos(i * 2 * Math.PI / numberOfSides), Ycenter + size * Math.sin(i * 2 * Math.PI / numberOfSides));
+}
+ 
+ctx.strokeStyle = "#000000";
+ctx.lineWidth = 10;
+ctx.stroke();
+	</script>
+</body>

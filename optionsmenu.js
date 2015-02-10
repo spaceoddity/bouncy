@@ -17,8 +17,7 @@ optionsmenu.OptionsMenu.prototype = {
 	},
 
 	show : function() {
-		this.options_menu.css("display","flex");
-		this.inner_menu.css("display","flex");		
+		this.options_menu.css("display","flex");	
 	},
 	
 	obscuring : function() {},
@@ -67,6 +66,9 @@ optionsmenu.OptionsMenu.prototype = {
 				color1 = utilities.RGB(PURPLE);
 				color2 = utilities.RGB(TEAL);
 				break;
+			case (this.radio_palette_rg.prop('checked')):
+				color1 = utilities.RGB(RED2);
+				color2 = utilities.RGB(GREEN);
 		}		
 		
 		//clear
@@ -92,6 +94,9 @@ optionsmenu.OptionsMenu.prototype = {
 			case (this.radio_palette_pt.prop('checked')):
 				bg_color = GRAY;
 				break;
+			case (this.radio_palette_rg.prop('checked')):
+				bg_color = ORANGE;
+				break;
 		}
 		this.options_menu.css("background", utilities.RGB(bg_color));
 	},
@@ -102,7 +107,7 @@ optionsmenu.OptionsMenu.prototype = {
 			case (this.radio_palette_rb.prop('checked')):
 				blend = "screen";
 				break;
-			case (this.radio_palette_pt.prop('checked')):
+			case (this.radio_palette_pt.prop('checked') || this.radio_palette_rg.prop('checked')):
 				blend = "multiply";
 				break;
 		}
@@ -113,13 +118,13 @@ optionsmenu.OptionsMenu.prototype = {
 		this.window = $(window);
 		this.body = $('body');
 		this.options_menu = $("#options_menu");
-		this.inner_menu = $("#inner_options");
 		this.canvas = $("#options_canvas")[0];
 		this.context = this.canvas.getContext('2d');
 		
 		$("#palette_radio").buttonset();
 		this.radio_palette_rb = $("#pal_rad_1");
 		this.radio_palette_pt = $("#pal_rad_2");
+		this.radio_palette_rg = $("#pal_rad_3");
 		
 		$("#bounce_radio").buttonset();
 		this.radio_bounce_norm = $("#bounce_rad_1");
@@ -151,7 +156,6 @@ optionsmenu.OptionsMenu.prototype = {
 		this.vergence_slider.on("slidestop", (function(){
 											this.orb.center_x = this.window.width()/2;
 											this.orb.center_y = this.window.height()/2;
-											console.log("slider changed");
 													}).bind(this)); 
 		this.size_spinner.spinner({stop: (function(){
 											this.size_slider();
@@ -166,6 +170,10 @@ optionsmenu.OptionsMenu.prototype = {
 											this.update_background();
 											this.update_blendmode();
 													 }).bind(this));
+		this.radio_palette_rg.on("click", (function(){
+											this.update_background();
+											this.update_blendmode();
+													 }).bind(this));
 		this.back_button.on("click", function(){game.state_manager.pop_state();});
 	},
 	
@@ -173,6 +181,7 @@ optionsmenu.OptionsMenu.prototype = {
 		this.body.off('keyup');
 		this.radio_palette_rb.off("click");
 		this.radio_palette_pt.off("click");
+		this.radio_palette_rg.off("click");
 		this.back_button.off("click");		
 	},
 	
@@ -206,6 +215,8 @@ optionsmenu.OptionsMenu.prototype = {
 			case "purpteal":
 				this.radio_palette_pt.prop('checked', true);
 				break;
+			case "redgreen":
+				this.radio_palette_rg.prop('checked', true);
 		}
 		$("#palette_radio").buttonset("refresh");	
 
@@ -222,6 +233,7 @@ optionsmenu.OptionsMenu.prototype = {
 		}
 		$("#bounce_radio").buttonset("refresh");
 		
+		this.time_spinner.minute_spinner("value", GAME_LENGTH);
 		this.size_spinner.spinner("value", ORB_SCALE);
 		this.speed_spinner.spinner("value", Math.floor(ORB_SPEED/ORB_SPEED_STEP));
 		this.vergence_slider.slider("value", Math.floor(ORB_SEPARATION/ORB_SCALE_STEP));
@@ -235,6 +247,9 @@ optionsmenu.OptionsMenu.prototype = {
 				break;
 			case (this.radio_palette_pt.prop('checked')):
 				PALETTE = "purpteal";
+				break;
+			case (this.radio_palette_rg.prop('checked')):
+				PALETTE = "redgreen";
 				break;
 		}
 		
@@ -252,6 +267,7 @@ optionsmenu.OptionsMenu.prototype = {
 		
 		ORB_SCALE = this.size_spinner.spinner("value");
 		ORB_SPEED = this.speed_spinner.spinner("value")*ORB_SPEED_STEP;
+		GAME_LENGTH = this.time_spinner.minute_spinner("value");
 		ORB_SEPARATION = this.vergence_slider.slider("value")*ORB_SCALE_STEP;
 	},
 };
@@ -277,10 +293,11 @@ optionsmenu.Orb.prototype = {
 		ctx.beginPath();
 		ctx.moveTo((this.center_x + this.separation/2) + this.outer_width/2 * Math.cos(0 + rot), this.center_y + this.outer_width/2 *  Math.sin(0 + rot));          
 		 
-		for (i = 1; i <= numberOfSides;i += 1) {
+		for (i = 1; i < numberOfSides;i += 1) {
 			ctx.lineTo ((this.center_x + this.separation/2) + this.outer_width/2 * Math.cos(i * 2 * Math.PI / numberOfSides + rot ), this.center_y + this.outer_width/2 * Math.sin(i * 2 * Math.PI / numberOfSides + rot));
 		}
-		 
+		ctx.closePath();
+		
 		ctx.lineWidth = this.outer_line_width;
 		ctx.stroke();				  	  
 
@@ -293,9 +310,10 @@ optionsmenu.Orb.prototype = {
 		ctx.beginPath();
 		ctx.moveTo((this.center_x - this.separation/2) + this.outer_width/2 * Math.cos(0 + rot), this.center_y + this.outer_width/2 *  Math.sin(0 + rot));          
 		 
-		for (i = 1; i <= numberOfSides;i += 1) {
+		for (i = 1; i < numberOfSides;i += 1) {
 			ctx.lineTo ((this.center_x - this.separation/2) + this.outer_width/2 * Math.cos(i * 2 * Math.PI / numberOfSides + rot ), this.center_y + this.outer_width/2 * Math.sin(i * 2 * Math.PI / numberOfSides + rot));
 		}
+		ctx.closePath();
 		
 		ctx.lineWidth = this.outer_line_width;
 		ctx.stroke();

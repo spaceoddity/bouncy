@@ -3,7 +3,6 @@ var i = 0;
 var TICKS = 60;
 var GRAY = [127,127,127];
 var BLUE = [0,0,255];
-
 var ORB_WIDTH = 50;
 var ORB_LINE_WIDTH = 2;
 var ORB_IRIS_WIDTH = 20;
@@ -12,13 +11,18 @@ var ORB_PUPIL_WIDTH = 4;
 var ORB_SPEED_STEP = 20;
 var ORB_SCALE_STEP = 15;
 var ORB_ROTATION_SPEED = 90; //degrees per second
-
 var ORB_BOUNCE_VALUES = {NORMAL: [1,1], HORIZONTAL: [1,0.1], VERTICAL: [0.1,1]}
+
+var RED2 = [255,0,0];
+var ORANGE = [255,127,0];
+var GREEN = [0,127,0];
+
+var GAME_LENGTH = 5; //minutes
 var ORB_SEPARATION = 60;
 var ORB_SCALE = 7;
 var ORB_SPEED = 60; //pixels per second
 var ORB_BOUNCE = ORB_BOUNCE_VALUES.NORMAL;
-var PALETTE = "purpteal";  // purpteal, redblue
+var PALETTE = "purpteal";  // purpteal, redblue, redgreen
 var PURPLE = [132,0,132];
 var TEAL = [0,129,129];
 var RED = [255,0,0];
