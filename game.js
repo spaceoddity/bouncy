@@ -42,6 +42,11 @@ game.settings = { level		   : function(){
 										color1 = utilities.RGB(RED);
 										color2 = utilities.RGB(BLUE);
 										background = utilities.RGB(BLACK);
+									} else if (PALETTE === "redgreen") {
+										blendmode = "multiply";
+										color1 = utilities.RGB(RED2);
+										color2 = utilities.RGB(GREEN);
+										background = utilities.RGB(ORANGE);
 									}
 									
 									return {										
