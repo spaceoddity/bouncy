@@ -11,9 +11,14 @@ body {
 	color: white;
 }
 
+/* changing jquery ui theme */
 .ui-button .ui-button-text {
 	font-size: 18px;
 }
+.ui-tabs .ui-tabs-nav li a {
+	font-size: 18px;
+}
+/*--------------------------*/
 
 .column_center {
 	display: flex;
@@ -62,6 +67,10 @@ body {
 }
 
 /* Options Menu */
+#options_container {
+	z-index: 1;
+}
+
 #vergence {
 	border: 1px solid rgba(255,255,255, 0.25);
 	padding: 6px 6px 0px 6px;
@@ -129,6 +138,16 @@ body {
 	width: 550px;
 }
 
+#options_buttons {
+	display: flex;
+	justify-content: flex-end;
+}
+
+#options_buttons button {
+	margin-left: 6px;
+	margin-top: 6px;
+}
+
 /*------------------------------------------------------------*/
 
 #countdown {
@@ -148,6 +167,10 @@ body {
 #pause_buttons button {
 	margin-top: 6px;
 	margin-left: 6px;
+}
+
+.pause_padding {
+	padding: 6px;
 }
 
 .hexagon {

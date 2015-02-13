@@ -1,5 +1,5 @@
 var level = {};
-//TODO: Pass colors through draw, not constructor
+
 level.Level = function(settings) {
 	this.settings = settings;
 	
@@ -15,10 +15,8 @@ level.Level.prototype = {
 		this.expand();
 		this.level.css("display","flex");		
 		this.choose_answer();		
-		this.orb = new orb.Orb((this.window.width())/2, (this.window.height())/2,
-							   this.settings.color1, this.settings.color2);						   
+		this.orb = new orb.Orb((this.window.width())/2, (this.window.height())/2, ORB_SCALE);						   
 		this.orb.set_answer(this.answer);
-		this.orb.center();
 		this.add_listeners();
 		this.elapsed = 0;
 	},
@@ -56,7 +54,14 @@ level.Level.prototype = {
 
 	update : function() {
 		if (this.pause.is(":hidden")) {
-			this.orb.update(this.canvas);
+			
+			var canvas = this.canvas;
+			var speed = ORB_SPEED;
+			var bounce = ORB_BOUNCE;
+			var separation = ORB_SEPARATION;
+			var scale = ORB_SCALE;
+			
+			this.orb.update(canvas, speed, bounce, separation, scale);
 			this.update_countdown();
 		}
 	},
@@ -64,12 +69,16 @@ level.Level.prototype = {
 	draw : function() {
 		var width = this.canvas.width;
 		var height = this.canvas.height;
-		
+	
 		//clear
 		this.context.clearRect(0,0,width,height);
 		
+		var ctx = this.context;
+		var color1 = this.settings.color1;
+		var color2 = this.settings.color2;
+		
 		//draw orb
-		this.orb.draw(this.context);
+		this.orb.draw(ctx, color1, color2);
 	},
 	
 	expand : function() {
@@ -90,6 +99,7 @@ level.Level.prototype = {
 		this.countdown.html(minutes + ":" + ("0"+seconds).slice(-2));		
 		
 		if (this.elapsed/TICKS >= GAME_LENGTH*60) {
+			this.create_graphs();
 			this.pause.show();
 			this.resume_button.button("disable");
 			this.body.off('keyup');
@@ -151,8 +161,8 @@ level.Level.prototype = {
 	},
 
 	hex_graph : function(color, id, data) {
-		var graph_width = this.window.width()*0.50;
-		var graph_height = this.window.height()*0.50;
+		var graph_width = this.window.width()*0.65;
+		var graph_height = this.window.height()*0.65;
 		
 		var data_width = this.window.width();
 		var data_height = this.window.height();
@@ -232,166 +242,7 @@ level.Level.prototype = {
 			this.orb.set_answer(this.answer);
 		} else {
 			this.incorrect_guesses.push([this.orb.iris_x, this.orb.iris_y]);
+			this.orb.incorrect_effect();
 		}
-	},
-} 
-
-orb = {};
-orb.Orb = function(center_x, center_y, color1, color2){
-	this.center_x = center_x;
-	this.center_y = center_y;
-
-	this.outer_width = ORB_SCALE * ORB_WIDTH;
-	this.outer_line_width = ORB_SCALE * ORB_LINE_WIDTH;
-	this.iris_width = ORB_SCALE * ORB_IRIS_WIDTH;
-	this.iris_line_width = ORB_SCALE * ORB_IRIS_LINE_WIDTH;
-	this.pupil_width = ORB_SCALE * ORB_PUPIL_WIDTH;
-	
-	this.speed_x = ORB_SPEED*ORB_BOUNCE[0];
-	this.speed_y = ORB_SPEED*ORB_BOUNCE[1];
-	
-	this.color1 = color1;
-	this.color2 = color2;
-	
-	this.rotation_counter = 0;
-};
-
-orb.Orb.prototype = {
-	center : function(){
-		var adjustment = (ORB_SEPARATION / 2) * (-1);
-		this.center_x += adjustment;
-		this.iris_x += adjustment;
-		this.pupil_x += adjustment;
-	},
-	
-	draw : function(ctx){
-
-		ctx.strokeStyle = this.color1;
-		ctx.fillStyle = this.color1;
-		var numberOfSides = 6;
-		var rot = this.rotation_counter * Math.PI/180;
-		
-		//outer 1
-		ctx.beginPath();
-		ctx.moveTo(this.center_x + this.outer_width/2 * Math.cos(0 + rot), this.center_y + this.outer_width/2 *  Math.sin(0 + rot));          
-		 
-		for (i = 1; i <= numberOfSides;i += 1) {
-			ctx.lineTo (this.center_x + this.outer_width/2 * Math.cos(i * 2 * Math.PI / numberOfSides + rot ), this.center_y + this.outer_width/2 * Math.sin(i * 2 * Math.PI / numberOfSides + rot));
-		}
-		 
-		ctx.lineWidth = this.outer_line_width;
-		ctx.stroke();		
-
-		//iris 1
-		ctx.beginPath();
-		ctx.arc(this.iris_x, this.iris_y, this.iris_width/2, 0, 2 * Math.PI);
-		ctx.lineWidth = this.iris_line_width;
-		ctx.stroke()				  	  
-
-		//-------------------------------------------
-
-		ctx.strokeStyle = this.color2;
-		ctx.fillStyle = this.color2;
-
-		//outer 2
-		ctx.beginPath();
-		ctx.moveTo((this.center_x + ORB_SEPARATION) + this.outer_width/2 * Math.cos(0 + rot), this.center_y + this.outer_width/2 *  Math.sin(0 + rot));          
-		 
-		for (i = 1; i <= numberOfSides;i += 1) {
-			ctx.lineTo ((this.center_x + ORB_SEPARATION) + this.outer_width/2 * Math.cos(i * 2 * Math.PI / numberOfSides + rot ), this.center_y + this.outer_width/2 * Math.sin(i * 2 * Math.PI / numberOfSides + rot));
-		}
-		
-		ctx.lineWidth = this.outer_line_width;
-		ctx.stroke();			   
-
-		//pupil 2
-		ctx.beginPath();
-		ctx.arc(this.pupil_x + ORB_SEPARATION, this.pupil_y, this.pupil_width/2, 0, 2 * Math.PI);
-		ctx.fill();
-	},
-
-	bounce : function(axis) {
-		if (axis === "x") {
-			this.speed_x = -this.speed_x;
-		} else if (axis === "y") {
-			this.speed_y = -this.speed_y;
-		}
-	},
-	
-/* 	random_bounce : function(axis) {
-		if (axis === "x") {
-			this.speed_x = (this.speed_x > 0) ? -ORB_SPEED : ORB_SPEED;
-			this.speed_y = (Math.random >= 0.5) ? -Math.random()*ORB_SPEED : Math.random()*ORB_SPEED;
-		} else if (axis === "y") {
-			this.speed_x = (Math.random() >= 0.5) ? -Math.random()*ORB_SPEED : Math.random()*ORB_SPEED;			
-			this.speed_y = (this.speed_y > 0) ? -ORB_SPEED : ORB_SPEED;		
-		}
-	}, */
-	
-	update : function(canvas) {
-		this.check_bounds(canvas);
-		
-		this.rotation_counter += ORB_ROTATION_SPEED/TICKS;
-		if (this.rotation_counter >= 360) {
-			this.rotation_counter -= 360;
-		}
-		
-		this.move();
-	},
-	
-	check_bounds : function(canvas) {
-		var radius = ((this.outer_width/2)+this.outer_line_width/2);
-		if (ORB_SEPARATION >= 0) {
-			if (this.center_x + this.speed_x/TICKS + radius + ORB_SEPARATION >= canvas.width || this.center_x + this.speed_x/TICKS - radius  <= 0 ) {
-				this.bounce("x");
-			}
-		} else {
-			if (this.center_x + this.speed_x/TICKS + radius  >= canvas.width || this.center_x + this.speed_x/TICKS - radius + ORB_SEPARATION  <= 0 ) {
-				this.bounce("x");
-			}		
-		}
-
-		if (this.center_y + this.speed_y/TICKS + radius >= canvas.height || this.center_y + this.speed_y/TICKS - radius <= 0) {
-			this.bounce("y");
-		}	
-	},
-	
-	move : function() {
-		this.center_x += this.speed_x/TICKS;
-		this.center_y += this.speed_y/TICKS;
-		this.iris_x += this.speed_x/TICKS;
-		this.iris_y += this.speed_y/TICKS;
-		this.pupil_x += this.speed_x/TICKS;
-		this.pupil_y += this.speed_y/TICKS;
-	},	
-
-	set_answer : function(answer) {
-		var x_offset = 0;
-		var y_offset = 0;		
-		
-		switch (answer) {
-			case "down":
-				y_offset = 4;
-				break;
-			case "up":
-				y_offset = (-4);
-				break;
-			case "right":
-				x_offset = 4;
-				break;
-			case "left":
-				x_offset = (-4);
-				break;
-		}
-
-		this.random_iris();
-		
-		this.pupil_x = this.iris_x + (x_offset * ORB_SCALE);
-		this.pupil_y = this.iris_y + (y_offset * ORB_SCALE);
-	},
-
-	random_iris : function() {
-		this.iris_x = this.center_x + utilities.randInt((-7)*ORB_SCALE, 7*ORB_SCALE);
-		this.iris_y = this.center_y + utilities.randInt((-7)*ORB_SCALE, 7*ORB_SCALE);
 	},
 };

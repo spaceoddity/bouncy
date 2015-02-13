@@ -18,6 +18,7 @@
 		<script src="level.js"></script>
 		<script src="game.js"></script>
 		<script src="optionsmenu.js"></script>
+		<script src="orb.js"></script>
 	</head>
 	<body>
 		<div id="viewport" class="column_center">
@@ -32,53 +33,58 @@
 			</div>
 			<div id="options_menu" class="column_center hidden">
 				<canvas id="options_canvas" class="bg_canvas"></canvas>
-				<div id="options_box" class="column_center rounded marginned padded floating_bg">
-					
-					<div id="vergence" class="rounded marginned">
-						<div class="options_width space-between"> <span>Divergence</span> <span>Convergence</span> </div>
-						<div id="vergence_slider" class="options_width"></div>
-					</div>
-
-					<div class="space-between options_width marginned">
-						<span class="options_border rounded">
-							<label for="size_spinner">Size:</label>
-							<input readonly id="size_spinner" name="value" class="options_spinner small_spin">
-						</span>
+				<div id="options_container">
+					<div id="options_box" class="column_center rounded padded floating_bg">
 						
-						<span class="options_border rounded">
-							<label for="speed_spinner">Speed:</label>
-							<input readonly id="speed_spinner" name="value" class="options_spinner small_spin">
-						</span>
-						
-						<span class="options_border rounded">
-							<label for="time_spinner">Time:</label>
-							<input readonly id="time_spinner" name="value" class="options_spinner big_spin">
-						</span>							
-					</div>
-					
-					<div class="space-between options_width marginned">
-						<div class="column_center">
-							<div id="palette_radio" class="row_center options_radio">
-								<div>Palette:&nbsp </div>
-								<input type="radio" id="pal_rad_1" name="pal_rad"><label for="pal_rad_1"> <div id="rb_button"></div> </label>
-								<input type="radio" id="pal_rad_2" name="pal_rad"><label for="pal_rad_2"> <div id="pt_button"></div> </label>
-								<input type="radio" id="pal_rad_3" name="pal_rad"><label for="pal_rad_3"> <div id="rg_button"></div> </label>
-							</div>
-						</div>					
-						<div id="bounce_radio" class="row_center options_radio">
-							<div>Bounce:&nbsp </div>
-							<input type="radio" id="bounce_rad_1" name="bounce_rad"><label for="bounce_rad_1"><img src="b1.png"></label>
-							<input type="radio" id="bounce_rad_2" name="bounce_rad"><label for="bounce_rad_2"><img src="b2.png"></label>
-							<input type="radio" id="bounce_rad_3" name="bounce_rad"><label for="bounce_rad_3"><img src="b3.png"></label>
+						<div id="vergence" class="rounded marginned">
+							<div class="options_width space-between"> <span>Divergence</span> <span>Convergence</span> </div>
+							<div id="vergence_slider" class="options_width"></div>
 						</div>
-					</div>					
+
+						<div class="space-between options_width marginned">
+							<span class="options_border rounded">
+								<label for="size_spinner">Size:</label>
+								<input readonly id="size_spinner" name="value" class="options_spinner small_spin">
+							</span>
+							
+							<span class="options_border rounded">
+								<label for="speed_spinner">Speed:</label>
+								<input readonly id="speed_spinner" name="value" class="options_spinner small_spin">
+							</span>
+							
+							<span class="options_border rounded">
+								<label for="time_spinner">Time:</label>
+								<input readonly id="time_spinner" name="value" class="options_spinner big_spin">
+							</span>							
+						</div>
+						
+						<div class="space-between options_width marginned">
+							<div class="column_center">
+								<div id="palette_radio" class="row_center options_radio">
+									<div>Palette:&nbsp </div>
+									<input type="radio" id="pal_rad_1" name="pal_rad"><label for="pal_rad_1"> <div id="rb_button"></div> </label>
+									<input type="radio" id="pal_rad_2" name="pal_rad"><label for="pal_rad_2"> <div id="pt_button"></div> </label>
+									<input type="radio" id="pal_rad_3" name="pal_rad"><label for="pal_rad_3"> <div id="rg_button"></div> </label>
+								</div>
+							</div>					
+							<div id="bounce_radio" class="row_center options_radio">
+								<div>Bounce:&nbsp </div>
+								<input type="radio" id="bounce_rad_1" name="bounce_rad"><label for="bounce_rad_1"><img src="b1.png"></label>
+								<input type="radio" id="bounce_rad_2" name="bounce_rad"><label for="bounce_rad_2"><img src="b2.png"></label>
+								<input type="radio" id="bounce_rad_3" name="bounce_rad"><label for="bounce_rad_3"><img src="b3.png"></label>
+							</div>
+						</div>
+					</div>
+					<div id="options_buttons">
+						<button id="options_save" type="button">Save</button>
+						<button id="options_cancel" type="button">Cancel</button>
+					</div>
 				</div>
-				<button id="options_back_button" type="button" class="marginned">Back</button>
 			</div>
 			<div id="level" class="hidden column_center">
 				<canvas id="canvas" class="bg_canvas"></canvas>
 				<div id="countdown"></div>
-				<div id="pause" class="hidden floating_bg rounded padded">
+				<div id="pause" class="hidden floating_bg rounded pause_padding">
 					<div id="pause_tabs">
 						<ul>
 							<li><a href="#tabs-1">Hits</a></li>

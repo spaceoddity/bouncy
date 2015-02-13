@@ -17,10 +17,10 @@ var RED2 = [255,0,0];
 var ORANGE = [255,127,0];
 var GREEN = [0,127,0];
 
-var GAME_LENGTH = 5; //minutes
-var ORB_SEPARATION = 60;
+var GAME_LENGTH = 1; //minutes
+var ORB_SEPARATION = 0;
 var ORB_SCALE = 7;
-var ORB_SPEED = 60; //pixels per second
+var ORB_SPEED = 0; //pixels per second
 var ORB_BOUNCE = ORB_BOUNCE_VALUES.NORMAL;
 var PALETTE = "purpteal";  // purpteal, redblue, redgreen
 var PURPLE = [132,0,132];
@@ -32,6 +32,15 @@ var utilities = {};
 
 utilities.randInt = function (min,max) {
 	return Math.floor(Math.random()*(max-min+1)+min);
+};
+
+utilities.nearestMultiple = function( number, multiple, floorceil) {
+    if (floorceil === "floor") {
+		return Math.floor(number/multiple)*multiple;
+	}
+	if (floorceil === "ceil") {
+		return Math.ceil(number/multiple)*multiple;
+	}
 };
 
 utilities.RGB = function (color) {

@@ -7,7 +7,8 @@ optionsmenu.OptionsMenu.prototype = {
 	
 	entered : function() {
 		this.get_html_elements();
-		this.orb = new optionsmenu.Orb((this.window.width())/2, (this.window.height())/2);		
+		this.orb = new orb.Orb((this.window.width())/2, (this.window.height())/2, ORB_SCALE);
+		this.orb.set_answer("right");
 		this.show();		
 		this.bind_events();
 		this.update_form();
@@ -25,7 +26,6 @@ optionsmenu.OptionsMenu.prototype = {
 	revealed : function() {},
 	
 	exiting : function() {
-		this.save_form();
 		this.release_events();
 		this.options_menu.hide();
 	},
@@ -143,7 +143,8 @@ optionsmenu.OptionsMenu.prototype = {
 
 		this.vergence_slider = $("#vergence_slider").slider();
 		
-		this.back_button = $("#options_back_button").button();
+		this.save_button = $("#options_save").button();
+		this.cancel_button = $("#options_cancel").button();
 	},
 
 	bind_events : function() {
@@ -154,13 +155,13 @@ optionsmenu.OptionsMenu.prototype = {
 		});
 		
 		this.vergence_slider.on("slidestop", (function(){
-											this.orb.center_x = this.window.width()/2;
-											this.orb.center_y = this.window.height()/2;
+											this.orb.set_xy(this.window.width()/2, this.window.height()/2);
+											this.orb.set_answer("right");
 													}).bind(this)); 
 		this.size_spinner.spinner({stop: (function(){
 											this.size_slider();
-											this.orb.center_x = this.window.width()/2;
-											this.orb.center_y = this.window.height()/2;
+											this.orb.set_xy(this.window.width()/2, this.window.height()/2);
+											this.orb.set_answer("right");
 													}).bind(this)}); 
 		this.radio_palette_rb.on("click", (function(){
 											this.update_background();
@@ -174,7 +175,11 @@ optionsmenu.OptionsMenu.prototype = {
 											this.update_background();
 											this.update_blendmode();
 													 }).bind(this));
-		this.back_button.on("click", function(){game.state_manager.pop_state();});
+		this.save_button.on("click", (function(){
+			this.save_form();
+			game.state_manager.pop_state();
+		}).bind(this));
+		this.cancel_button.on("click", function(){game.state_manager.pop_state();});		
 	},
 	
 	release_events : function() {
@@ -182,7 +187,8 @@ optionsmenu.OptionsMenu.prototype = {
 		this.radio_palette_rb.off("click");
 		this.radio_palette_pt.off("click");
 		this.radio_palette_rg.off("click");
-		this.back_button.off("click");		
+		this.save_button.off("click");
+		this.cancel_button.off("click");
 	},
 	
 	size_slider : function() {
@@ -269,96 +275,5 @@ optionsmenu.OptionsMenu.prototype = {
 		ORB_SPEED = this.speed_spinner.spinner("value")*ORB_SPEED_STEP;
 		GAME_LENGTH = this.time_spinner.minute_spinner("value");
 		ORB_SEPARATION = this.vergence_slider.slider("value")*ORB_SCALE_STEP;
-	},
-};
-
-optionsmenu.Orb = function(center_x, center_y){
-	this.center_x = center_x;
-	this.center_y = center_y;
-	
-	this.rotation_counter = 0;
-	this.x_dir = 1;
-	this.y_dir = 1;
-};
-
-optionsmenu.Orb.prototype = {	
-	draw : function(ctx, color1, color2){
-
-		ctx.strokeStyle = color1;
-		ctx.fillStyle = color1;
-		var numberOfSides = 6;
-		var rot = this.rotation_counter * Math.PI/180;
-		
-		//outer 1
-		ctx.beginPath();
-		ctx.moveTo((this.center_x + this.separation/2) + this.outer_width/2 * Math.cos(0 + rot), this.center_y + this.outer_width/2 *  Math.sin(0 + rot));          
-		 
-		for (i = 1; i < numberOfSides;i += 1) {
-			ctx.lineTo ((this.center_x + this.separation/2) + this.outer_width/2 * Math.cos(i * 2 * Math.PI / numberOfSides + rot ), this.center_y + this.outer_width/2 * Math.sin(i * 2 * Math.PI / numberOfSides + rot));
-		}
-		ctx.closePath();
-		
-		ctx.lineWidth = this.outer_line_width;
-		ctx.stroke();				  	  
-
-		//-------------------------------------------
-
-		ctx.strokeStyle = color2;
-		ctx.fillStyle = color2;
-
-		//outer 2
-		ctx.beginPath();
-		ctx.moveTo((this.center_x - this.separation/2) + this.outer_width/2 * Math.cos(0 + rot), this.center_y + this.outer_width/2 *  Math.sin(0 + rot));          
-		 
-		for (i = 1; i < numberOfSides;i += 1) {
-			ctx.lineTo ((this.center_x - this.separation/2) + this.outer_width/2 * Math.cos(i * 2 * Math.PI / numberOfSides + rot ), this.center_y + this.outer_width/2 * Math.sin(i * 2 * Math.PI / numberOfSides + rot));
-		}
-		ctx.closePath();
-		
-		ctx.lineWidth = this.outer_line_width;
-		ctx.stroke();
-	},
-
-	bounce : function(axis) {
-		if (axis === "x") {
-			this.x_dir = this.x_dir * (-1);
-		} else if (axis === "y") {
-			this.y_dir = this.y_dir * (-1);
-		}
-	},
-	
-	update : function(canvas, speed, bounce, separation, scale) {
-		this.speed_x = speed*bounce[0] * this.x_dir;
-		this.speed_y = speed*bounce[1] * this.y_dir;
-		this.separation = separation;
-		this.outer_width = scale * ORB_WIDTH;
-		this.outer_line_width = scale * ORB_LINE_WIDTH;
-		
-		this.check_bounds(canvas);
-		
-		this.rotation_counter += ORB_ROTATION_SPEED/TICKS;
-		if (this.rotation_counter >= 360) {
-			this.rotation_counter -= 360;
-		}
-		
-		this.move();
-	},
-	
-	check_bounds : function(canvas) {
-		var radius = ((this.outer_width/2)+this.outer_line_width/2);
-		if (this.center_x + this.speed_x/TICKS + radius + this.separation/2 >= canvas.width ||
-			this.center_x + this.speed_x/TICKS + radius - this.separation/2 >= canvas.width ||
-			this.center_x + this.speed_x/TICKS - radius - this.separation/2  <= 0 ||
-			this.center_x + this.speed_x/TICKS - radius + this.separation/2  <= 0){
-				this.bounce("x");
-		}
-		if (this.center_y + this.speed_y/TICKS + radius >= canvas.height || this.center_y + this.speed_y/TICKS - radius <= 0) {
-			this.bounce("y");
-		}	
-	},
-	
-	move : function() {
-		this.center_x += this.speed_x/TICKS;
-		this.center_y += this.speed_y/TICKS;
 	},
 };
