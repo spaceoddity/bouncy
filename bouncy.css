@@ -89,7 +89,7 @@ body {
 	padding: 0.4em 0.6em 0.2em 0.6em;
 }
 
-#rb_button {
+.rb_button {
   height: 41px;
   width: 41px;
   background-image: linear-gradient(
@@ -100,7 +100,7 @@ body {
     );
 }
 
-#pt_button {
+.pt_button {
   height: 41px;
   width: 41px;
   background-image: linear-gradient(
@@ -111,7 +111,7 @@ body {
     );
 }
 
-#rg_button {
+.rg_button {
   height: 41px;
   width: 41px;
   background-image: linear-gradient(
@@ -146,6 +146,11 @@ body {
 #options_buttons button {
 	margin-left: 6px;
 	margin-top: 6px;
+}
+
+/*------------------------------------------------------------*/
+#calib_slider {
+	width: 406px;
 }
 
 /*------------------------------------------------------------*/

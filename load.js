@@ -1,5 +1,7 @@
 var load = {};
 
+//TODO: load sounds and images
+
 load.Load = function() {
 };
 
@@ -15,7 +17,6 @@ load.Load.prototype = {
 	
 	obscuring : function() {
 		this.load_menu.hide();
-		//this.contract();
 	},
 		
 	update : function(ticks) {},

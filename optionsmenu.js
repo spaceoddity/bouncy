@@ -7,8 +7,8 @@ optionsmenu.OptionsMenu.prototype = {
 	
 	entered : function() {
 		this.get_html_elements();
-		this.orb = new orb.Orb((this.window.width())/2, (this.window.height())/2, ORB_SCALE);
-		this.orb.set_answer("right");
+		this.orb = new orb.Orb((this.window.width())/2, (this.window.height())/2);
+		this.orb.new_answer();
 		this.show();		
 		this.bind_events();
 		this.update_form();
@@ -31,16 +31,16 @@ optionsmenu.OptionsMenu.prototype = {
 	},
 		
 	update : function() {
-		var bounce;
+		var bounce_ratio;
 		switch(true) {
 			case (this.radio_bounce_norm.prop('checked')):
-				bounce = ORB_BOUNCE_VALUES.NORMAL;
+				bounce_ratio = ORB_BOUNCE_VALUES.NORMAL;
 				break;
 			case (this.radio_bounce_horz.prop('checked')):
-				bounce = ORB_BOUNCE_VALUES.HORIZONTAL;
+				bounce_ratio = ORB_BOUNCE_VALUES.HORIZONTAL;
 				break;
 			case (this.radio_bounce_vert.prop('checked')):
-				bounce = ORB_BOUNCE_VALUES.VERTICAL;
+				bounce_ratio = ORB_BOUNCE_VALUES.VERTICAL;
 				break;
 		}		
 		
@@ -48,7 +48,7 @@ optionsmenu.OptionsMenu.prototype = {
 		var speed = this.speed_spinner.spinner("value")*ORB_SPEED_STEP;
 		var scale = this.size_spinner.spinner("value");
 		
-		this.orb.update(this.canvas, speed, bounce, separation, scale);
+		this.orb.update(this.canvas, {bounce_ratio:bounce_ratio, separation:separation, speed:speed, scale:scale});
 	},
 		
 	draw : function() {
@@ -156,12 +156,12 @@ optionsmenu.OptionsMenu.prototype = {
 		
 		this.vergence_slider.on("slidestop", (function(){
 											this.orb.set_xy(this.window.width()/2, this.window.height()/2);
-											this.orb.set_answer("right");
+											this.orb.new_answer();
 													}).bind(this)); 
 		this.size_spinner.spinner({stop: (function(){
 											this.size_slider();
 											this.orb.set_xy(this.window.width()/2, this.window.height()/2);
-											this.orb.set_answer("right");
+											this.orb.new_answer();
 													}).bind(this)}); 
 		this.radio_palette_rb.on("click", (function(){
 											this.update_background();

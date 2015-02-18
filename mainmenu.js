@@ -38,5 +38,8 @@ mainmenu.MainMenu.prototype = {
 		this.options_button.bind("click", function(){
 			game.state_manager.push_state("options_menu");
 		});
+		this.calibrate_button.bind("click", function(){
+			game.state_manager.push_state("calibrate_menu");
+		});
 	},
 };

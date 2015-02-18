@@ -56,69 +56,6 @@ game.settings = { level		   : function(){
 										background : background,
 									};
 								 },
-/*				  
-				  options_menu : function(){ return {background : BLACK}; },
-				  
-				  calibrate_menu: function(){ return {background : BLACK}; },
-				  
-				  calibrate_rb : function(){ return {background : BLACK}; },
-				  
-				  calibrate_pt : function(){ return {background : BLACK}; },
-				  
-				  instructions : function(){ return {background : BLACK}; },
-				  
-				  level : {  settings : function(speed) {
-											var BASE_PLAYER_SPEED = 150;
-											var CHANGE_ENEMY = 4;
-											var ENEMIESONSCREEN = 8;
-											
-											var enemy_speed = speed * 20 + 30; // lowest speed is 50, increases by 20
-											var player_speed;
-												if (BASE_PLAYER_SPEED > enemy_speed) {
-													player_speed = BASE_PLAYER_SPEED;
-												} else {
-													player_speed = enemy_speed;
-												}
-											var enemy_fall_change_rate = 600/enemy_speed*CHANGE_ENEMY;
-											var enemy_create_rate = ENEMIESONSCREEN / (600 / enemy_speed);
-											
-											return {
-												enemy_speed : enemy_speed,								
-												player_speed : player_speed,											    
-											    enemy_fall_change_rate : enemy_fall_change_rate,							   
-											    enemy_create_rate : enemy_create_rate,
-												gem_speed : enemy_speed,
-											    gem_create_rate : enemy_create_rate/2,
-											    gem_fall_change_rate : enemy_fall_change_rate,
-												 
-											    blink_duration         : 1   , // seconds
-											    blink_rate             : 10  , // blinks per second
-												 
-											    combo_initial          : 10  , // squares
-											};
-										},
-						   palette : { REDBLUE : function(){
-												return {
-												 images                 : graphics.screens.hidden.rb,
-												 bg_color               : storage.get("BLACKISH"),
-											     menu_color             : WHITE,
-												 };
-												},
-									   PURPTEAL : function(){
-												return {
-												 images                 : graphics.screens.hidden.pt,
-												 bg_color               : GRAY,
-												 menu_color             : BLACK,											 
-												 };
-												},
-									 },
-								
-						   lens : { BOTH : function(){ return ["canvas1", "canvas2", "canvas3"]; },
-						            RED  : function(){ return ["canvas1", "canvas1", "canvas3"]; },
-									BLUE : function(){ return ["canvas2", "canvas2", "canvas3"]; },
-						          },						  
-						  
-						   length : function(){ return storage.get("LENGTH");} */
 };
 
 game.create_state = function(state) {
@@ -129,27 +66,16 @@ game.create_state = function(state) {
 			return new mainmenu.MainMenu();
 		case "options_menu":
 			return new optionsmenu.OptionsMenu();
-/*		case "calibrate_menu":
-			return new calibratemenu.CalibrateMenu(graphics.screens.layers, game.settings.calibrate_menu() );
-		case "calibrate_rb":
-			return new calibraterb.CalibrateRB(graphics.screens.layers, game.settings.calibrate_rb() );
-		case "calibrate_pt":
-			return new calibratept.CalibratePT(graphics.screens.layers, game.settings.calibrate_pt() ); */
+		case "calibrate_menu":
+			return new calibratemenu.CalibrateMenu();
 		case "level":
 			return new level.Level(game.settings.level());
-/* 		case "pause":
-			return new pause.Pause(graphics.screens.layers);
-		case "end":
-			return new end.End(graphics.screens.layers);
-		case "instructions":
-			return new instructions.Instructions(graphics.screens.layers, game.settings.instructions() ); */
 	}
 };
 
 game.start = function () {
 	$.widget( "ui.minute_spinner", $.ui.spinner, {
 		_format: function(value) { return value + ' min'; },
-
 		_parse: function(value) { return parseInt(value); }
 	});
 	

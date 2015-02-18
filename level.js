@@ -1,42 +1,65 @@
 var level = {};
 
 level.Level = function(settings) {
-	this.settings = settings;
+	//settings determined by palette chosen by user
+	this.color1 = settings.color1;
+	this.color2 = settings.color2;
+	this.blendmode = settings.blendmode;
+
+	//html elements
+	this.window = $(window);
+	this.body = $('body');
+	this.level = $("#level");
+	this.level.css("background",settings.background);
+	this.canvas = $("#canvas")[0];
+	this.context = this.canvas.getContext('2d');
+	this.countdown = $("#countdown");
+	this.pause = $("#pause")
+	$("#pause_tabs").tabs();
+	this.hits_graph = $("#hits_graph");
+	this.misses_graph = $("#misses_graph");
+	this.resume_button = $("#resume_button").button().button("enable");
+	this.quit_button = $("#quit_button").button();	
 	
-	this.answer = "";
-	this.correct_guesses = [];
-	this.incorrect_guesses = [];
+	//functions that use closures and must be declared in the constructor, not the prototype
+	this.update_countdown = (function() {
+		var elapsed = 0;
+		return function() {
+			elapsed += 1;
+			var remaining = (GAME_LENGTH*60) - (elapsed/TICKS);
+			var minutes = Math.floor(remaining/60);
+			var seconds = Math.floor(remaining%60);
+			this.countdown.html(minutes + ":" + ("0"+seconds).slice(-2));		
+			
+			if (elapsed/TICKS >= GAME_LENGTH*60) {
+				elapsed = 0;
+				this.create_graphs();
+				this.pause.show();
+				this.resume_button.button("disable");
+				this.body.off('keyup');
+			}
+		};
+	})();
 }
 
 level.Level.prototype = {
 
 	entered : function() {
-		this.get_html_elements();
+		//exapnd the level to fill the browser window
 		this.expand();
-		this.level.css("display","flex");		
-		this.choose_answer();		
-		this.orb = new orb.Orb((this.window.width())/2, (this.window.height())/2, ORB_SCALE);						   
-		this.orb.set_answer(this.answer);
-		this.add_listeners();
-		this.elapsed = 0;
-	},
+		
+		//set the blend mode, which must be done after expansion
+		this.context.globalCompositeOperation = this.blendmode;
+		
+		//make the level visible
+		this.level.css("display","flex");
 
-	get_html_elements : function() {
-		this.window = $(window);
-		this.body = $('body');
-		this.level = $("#level");
-		this.level.css("background",this.settings.background);
-		this.canvas = $("#canvas")[0];
-		this.context = this.canvas.getContext('2d');
-		this.countdown = $("#countdown");
+		//create an orb in the center of the level
+		this.orb = new orb.Orb((this.window.width())/2, (this.window.height())/2);						   
+		this.orb.new_answer();
 		
-		this.pause = $("#pause")
-		$("#pause_tabs").tabs();
-		this.hits_graph = $("#hits_graph");
-		this.misses_graph = $("#misses_graph");
-		
-		this.resume_button = $("#resume_button").button().button("enable");
-		this.quit_button = $("#quit_button").button();
+		//add keyboard listeners
+		this.add_listeners();
 	},
 		
 	obscuring : function() {
@@ -53,32 +76,22 @@ level.Level.prototype = {
 	},
 
 	update : function() {
+		//
 		if (this.pause.is(":hidden")) {
-			
 			var canvas = this.canvas;
-			var speed = ORB_SPEED;
-			var bounce = ORB_BOUNCE;
-			var separation = ORB_SEPARATION;
-			var scale = ORB_SCALE;
-			
-			this.orb.update(canvas, speed, bounce, separation, scale);
+			this.orb.update(canvas);
 			this.update_countdown();
 		}
 	},
 	
 	draw : function() {
+		//clear canvas
 		var width = this.canvas.width;
 		var height = this.canvas.height;
-	
-		//clear
 		this.context.clearRect(0,0,width,height);
 		
-		var ctx = this.context;
-		var color1 = this.settings.color1;
-		var color2 = this.settings.color2;
-		
 		//draw orb
-		this.orb.draw(ctx, color1, color2);
+		this.orb.draw(this.context, this.color1, this.color2);
 	},
 	
 	expand : function() {
@@ -86,24 +99,6 @@ level.Level.prototype = {
 		this.level.height(this.window.height());		
 		this.canvas.width = this.window.width();
 		this.canvas.height = this.window.height();
-		this.context.globalCompositeOperation = this.settings.blendmode;
-	},
-
-	update_countdown : function() {
-		this.elapsed += 1;
-
-		var remaining = (GAME_LENGTH*60) - (this.elapsed/TICKS);
-		
-		var minutes = Math.floor(remaining/60);
-		var seconds = Math.floor(remaining%60);
-		this.countdown.html(minutes + ":" + ("0"+seconds).slice(-2));		
-		
-		if (this.elapsed/TICKS >= GAME_LENGTH*60) {
-			this.create_graphs();
-			this.pause.show();
-			this.resume_button.button("disable");
-			this.body.off('keyup');
-		}
 	},
 	
 	add_listeners : function() {
@@ -124,7 +119,7 @@ level.Level.prototype = {
 					break;
 			};
 			if (guessed.length > 0) {
-				this.check_answer(guessed);
+				this.orb.check_answer(guessed);
 			}
 			if (event.keyCode === 27) {
 				this.pause.toggle();
@@ -134,7 +129,10 @@ level.Level.prototype = {
 			}
 		}).bind(this));
 		
-		this.resume_button.on("click", (function(){this.pause.toggle();}).bind(this));
+		this.resume_button.on("click", (function(){
+			this.pause.toggle();
+		}).bind(this));
+		
 		this.quit_button.on("click", (function(){
 			this.pause.toggle();
 			game.state_manager.pop_state();
@@ -152,15 +150,15 @@ level.Level.prototype = {
 		this.hits_graph.empty();
 		this.misses_graph.empty();
 		
+		//create new correct hex graph
+		this.hex_graph(HEX_CORRECT_COLOR,"#hits_graph", this.orb.correct_guesses);
 		
-		//create new correct hex graph------------------------------
-		this.hex_graph("darkgreen","#hits_graph", this.correct_guesses);
-		
-		//create new incorrect hex graph----------------------------
-		this.hex_graph("darkred","#misses_graph", this.incorrect_guesses);
+		//create new incorrect hex graph
+		this.hex_graph(HEX_INCORRECT_COLOR,"#misses_graph", this.orb.incorrect_guesses);
 	},
 
 	hex_graph : function(color, id, data) {
+		//use d3 to create hexbin
 		var graph_width = this.window.width()*0.65;
 		var graph_height = this.window.height()*0.65;
 		
@@ -217,32 +215,7 @@ level.Level.prototype = {
             .style("stroke", "gray")
             .style("fill", "none");			
 	},
-	
-	choose_answer : function() {
-		switch(utilities.randInt(1,4)) {
-			case 1:
-				this.answer = "up";
-				break;
-			case 2:
-				this.answer = "down";
-				break;
-			case 3:
-				this.answer = "right";
-				break;
-			case 4:
-				this.answer = "left";
-				break;
-		};
-	},
-	
-	check_answer : function(guessed) {
-		if (guessed === this.answer) {
-			this.correct_guesses.push([this.orb.iris_x, this.orb.iris_y]);
-			this.choose_answer();
-			this.orb.set_answer(this.answer);
-		} else {
-			this.incorrect_guesses.push([this.orb.iris_x, this.orb.iris_y]);
-			this.orb.incorrect_effect();
-		}
-	},
+//TODO: add other page of pause menu
+//TODO: make hexes proportional to canvas
+//TODO: comment all of the code
 };
