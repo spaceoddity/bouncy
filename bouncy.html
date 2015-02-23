@@ -83,11 +83,15 @@
 				<button id="cal_rg_button" type="button"><div class="rg_button"></div></button>
 				<div id="cal_dialog" title="Calibrate" class="hidden">
 					<div class="column_center">				
-						<p>Look through the <span id="calib_span"></span> lens.</p>
-						<p>Adjust the slider until the squares disappear.</p>
-						<canvas width=400 height=72></canvas>
-						<div id="calib_slider"></div>
-						<button type="button">Next</button>
+						<div class="column_center">
+							<div>Look through the <span id="calib_span"></span> lens.</div>
+							<div>Adjust the slider until the squares disappear.</div>
+						</div>
+						<div class="column_center">
+							<canvas id="cal_canvas" width=400 height=72></canvas>
+							<div id="calib_slider"></div>
+						</div>
+						<button id="cal_button" type="button"></button>
 					</div>
 				</div>
 			</div>
@@ -116,7 +120,6 @@
 				</div>
 			</div>
 		</div>
-		
 		<script>
 			$(document).ready(function(){
 				game.start();

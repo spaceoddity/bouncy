@@ -149,8 +149,43 @@ body {
 }
 
 /*------------------------------------------------------------*/
+#cal_dialog {
+	background: rgb(64,64,64);
+	padding: 12px 15px 10px 15px;
+}
+
+.ui-dialog .ui-dialog-titlebar {
+	padding-top: 7px;
+	padding-bottom: 7px;
+}
+
+.ui-dialog .ui-dialog-title {
+	font-size: 18px;
+	margin: 0px;
+}
+
+#cal_dialog > div {
+	background: rgb(64,64,64);
+	color: white;
+	font-family: Arial,sans-serif;	
+	font-size: 18px;
+}
+
+#cal_dialog canvas {
+	margin-bottom: 9px;
+}
+
 #calib_slider {
 	width: 406px;
+	margin-top: 5px;
+}
+
+#cal_dialog > div > div:nth-child(1) {
+	margin-bottom: 12px;
+}
+
+#cal_dialog > div > div:nth-child(2){
+	margin-bottom: 20px;
 }
 
 /*------------------------------------------------------------*/
