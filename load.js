@@ -1,37 +1,24 @@
-var load = {};
-
 //TODO: load sounds and images
 
-load.Load = function() {
-};
+Load = game_manager.new_scene("load");
 
-load.Load.prototype = {
+Load.entered = function() {
+	this.get_html_elements();
+	this.load_menu.css("display","flex");
+	this.expand();
+	game_manager.push_scene("main_menu");
+};
 	
-	entered : function() {
-		this.get_html_elements();
-		this.load_menu.css("display","flex");
-		this.expand();
-		
-		game.state_manager.push_state("main_menu");
-	},
+Load.obscuring = function() {
+	this.load_menu.hide();
+};
 	
-	obscuring : function() {
-		this.load_menu.hide();
-	},
-		
-	update : function(ticks) {},
-		
-	draw : function() {},
+Load.get_html_elements = function() {
+	this.window = $(window);
+	this.viewport = $("#viewport");
+	this.load_menu = $("#loading");
+};
 	
-	get_html_elements : function() {
-		this.window = $(window);
-		this.viewport = $("#viewport");
-		this.load_menu = $("#loading");
-	},
-	
-	expand : function() {
-		if (this.window.height() > this.load_menu.height()) {
-			this.viewport.height(this.window.height());
-		}
-	},
+Load.expand = function() {
+	this.viewport.height(this.window.height());
 };
