@@ -3,21 +3,22 @@ var game_manager = {
 	scenes : {},
 	ticks : undefined,
 	
-	start : function(scene, ticks){	
-		//callback?
+	start : function(scene, ticks, callback){	
+		if (callback !== undefined) {
+			callback();
+		}
 		this.ticks = ticks;
 		this.push_scene(scene);
 		setInterval(this.update.bind(this), 1000.0/this.ticks);
 		requestAnimationFrame(this.draw.bind(this));
 	},
 
-	push_scene : function(scene){
+	push_scene : function(scene, args){
 		if (this.scene_stack.length > 0) {
 			this.scene_stack[this.scene_stack.length-1].obscuring();
 		}
-		this.scene_stack.push(this.scenes[scene]);
-		this.scene_stack[this.scene_stack.length-1].init();		
-		this.scene_stack[this.scene_stack.length-1].entered();
+		this.scene_stack.push(Object.create(this.scenes[scene]));	
+		this.scene_stack[this.scene_stack.length-1].entered(args);
 	},
 
 	pop_scene : function(){
@@ -29,7 +30,7 @@ var game_manager = {
 	change_scene : function(){},
 	
 	new_scene : function(name){	
-		this.scenes[name] = Object.create(this._BasicScene).base_init(name);
+		this.scenes[name] = Object.create(this.BasicScene).init(name);
 		return this.scenes[name];
 	},
 	
@@ -42,12 +43,11 @@ var game_manager = {
 		this.scene_stack[this.scene_stack.length-1].update(this.ticks);
 	},
 	
-	_BasicScene : {
-		base_init : function(name){
+	BasicScene : {
+		init : function(name){
 			this.name = name;
 			return this;
 		},
-		init : function(){},
 		entered : function(){},
 		obscuring : function(){},
 		revealed : function(){},
@@ -55,5 +55,4 @@ var game_manager = {
 		update : function(){},
 		draw : function(){},		
 	},
-
 };

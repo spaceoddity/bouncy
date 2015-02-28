@@ -4,31 +4,11 @@
 <body>
 <script>
 
-var animal = {
-	
-	shared : 10,
-	
-	init : function(name){
-		this.name = name;
-		console.log(name, "initializing");
-		return this;
-	},
-	
-	speak : function(){
-		console.log(this.name, "is my name!");
-	},
-};
+var deb = "silly";
 
-var lion = Object.create(animal).init("lion");
-lion.shared = 4;
-
-var bird = Object.create(animal).init("bird");
-
-
-
-
-console.log("lion has", lion.shared);
-console.log("bird has", bird.shared);
+for (var i = 0; i < deb.length; i++) {
+	console.log(i, deb[i]);
+}
 
 </script>
 </body>

@@ -13,7 +13,6 @@ orb.Orb = function(center_x, center_y){
 	this.outer_line_width = this.scale * ORB_LINE_WIDTH;
 	this.iris_width = this.scale * ORB_IRIS_WIDTH;
 	this.iris_line_width = this.scale * ORB_IRIS_LINE_WIDTH;
-	this.pupil_width = this.scale * ORB_PUPIL_WIDTH;
 	
 	this.rotation_counter = 0;
 	
@@ -94,17 +93,17 @@ orb.Orb = function(center_x, center_y){
 
 orb.Orb.prototype = {	
 	draw : function(ctx, color1, color2){
-		this.draw_outer_hex(ctx,color1,1);
-		this.draw_iris(ctx,color1,1);		
-		this.draw_outer_hex(ctx,color2,-1);
-		this.draw_pupil(ctx,color2,-1);
+		this.draw_outer_hex(ctx, color1, 1);
+		this.draw_outer_hex(ctx, color2, -1);	
+		this.draw_word(ctx,color1, this.word[0], 1);
+		this.draw_word(ctx,color2, this.word[1], -1);
 	},	
 
 	draw_outer_hex : function(ctx, color, polarity){
 		ctx.strokeStyle = color;
 		ctx.lineWidth = this.outer_line_width + this.extra_thickness;
 		
-		var sides = 6;
+		var sides = 4;
 		var rotation = this.rotation_counter * Math.PI/180;
 		var radius = this.outer_width/2;
 		var x = this.center_x + polarity*(this.separation/2) + this.x_offset; 
@@ -119,29 +118,16 @@ orb.Orb.prototype = {
 		ctx.stroke();			
 	},	
 
-	draw_iris : function(ctx, color, polarity){
-		ctx.strokeStyle = color;		
-		
-		radius = this.iris_width/2;
-		x = this.iris_x + polarity*(this.separation/2) + this.x_offset;
-		y = this.iris_y;
-		
-		ctx.beginPath();
-		ctx.arc(x, y, radius, 0, 2 * Math.PI);
-		ctx.lineWidth = this.iris_line_width + this.extra_thickness;
-		ctx.stroke()
-	},
-	
-	draw_pupil : function(ctx, color, polarity){
+	draw_word : function(ctx, color, word, polarity){	
 		ctx.fillStyle = color;
+		ctx.font = "bold " + ORB_FONT_SIZE*this.scale+"px " + ORB_FONT;
+		ctx.textAlign = "center";
+		ctx.textBaseline = "middle";
 		
-		radius = this.pupil_width/2 + this.extra_thickness/2;
-		x = this.pupil_x + polarity*(this.separation/2) + this.x_offset;
-		y = this.pupil_y;
+		x = this.center_x + polarity*(this.separation/2) + this.x_offset;
+		y = this.center_y;
 		
-		ctx.beginPath();
-		ctx.arc(x, y, radius, 0, 2 * Math.PI);
-		ctx.fill();	
+		ctx.fillText(word,x,y);
 	},
 	
 	bounce : function(axis) {
@@ -167,7 +153,7 @@ orb.Orb.prototype = {
 						this.outer_line_width = this.scale * ORB_LINE_WIDTH;
 						this.iris_width = this.scale * ORB_IRIS_WIDTH;
 						this.iris_line_width = this.scale * ORB_IRIS_LINE_WIDTH;
-						this.pupil_width = this.scale * ORB_PUPIL_WIDTH;
+						//this.pupil_width = this.scale * ORB_PUPIL_WIDTH;
 						break;					
 				}
 			}
@@ -212,42 +198,15 @@ orb.Orb.prototype = {
 		this.center_y += this.speed_y/TICKS;
 		this.iris_x += this.speed_x/TICKS;
 		this.iris_y += this.speed_y/TICKS;
-		this.pupil_x += this.speed_x/TICKS;
-		this.pupil_y += this.speed_y/TICKS;
+		//this.pupil_x += this.speed_x/TICKS;
+		//this.pupil_y += this.speed_y/TICKS;
 	},	
 
-	new_answer : function() {
-		var x_offset = 0;
-		var y_offset = 0;		
-
-		switch(utilities.randInt(1,4)) {
-			case 1:
-				this.answer = "up";
-				y_offset = -4;
-				break;
-			case 2:
-				this.answer = "down";
-				y_offset = 4;
-				break;
-			case 3:
-				this.answer = "right";
-				x_offset = 4;
-				break;
-			case 4:
-				this.answer = "left";
-				x_offset = (-4);
-				break;
-		}
-				
-		this.random_iris();
+	new_answer : function() {	
+		var word = Word.new_word()
 		
-		this.pupil_x = this.iris_x + (x_offset * this.scale);
-		this.pupil_y = this.iris_y + (y_offset * this.scale);
-	},
-
-	random_iris : function() {
-		this.iris_x = this.center_x + utilities.randInt((-7)*this.scale, 7*this.scale);
-		this.iris_y = this.center_y + utilities.randInt((-7)*this.scale, 7*this.scale);
+		this.answer = word[0];
+		this.word = [word[1], word[2]];
 	},
 	
 	set_xy : function(new_x, new_y) {
@@ -270,11 +229,11 @@ orb.Orb.prototype = {
 	check_answer : function(guessed) {
 		//if not currently shaking or pulsating, check answers
 		if (!this.shaking && !this.pulsating) {
-			if (guessed === this.answer) {
-				this.correct_guesses.push([this.iris_x, this.iris_y]);
+			if ((this.answer === "living" && guessed === "right") || (this.answer === "not_living" && guessed === "left")) {
+				this.correct_guesses.push([this.center_x, this.center_y]);
 				this.pulsate();
 			} else {
-				this.incorrect_guesses.push([this.iris_x, this.iris_y]);
+				this.incorrect_guesses.push([this.center_x, this.center_y]);
 				this.shake();
 			}
 		}
@@ -282,4 +241,79 @@ orb.Orb.prototype = {
 	
 //TODO: add sounds
 //TODO: comment code
+};
+
+Word = {
+	new_word : function(){
+		var word;
+		var answer;
+		
+		if (utilities.randInt(1,100) > 50) {
+			answer = "living";
+			word = this.living[utilities.randInt(0,this.living.length-1)];
+			word = this.split(word);
+		} else {
+			answer = "not_living";
+			word = this.not_living[utilities.randInt(0,this.not_living.length-1)]
+			word = this.split(word);			
+			return ["not_living", word[0], word[1]];
+		}
+		
+		return [answer, word[0], word[1]];
+	},
+	
+	split : function(word){
+		var split_word;
+		var pattern;
+		var five = ["xooxo", "oxoox", "xoxxo", "oxxox"];
+		var six = ["xooxxo", "oxxoox"];		
+		var parse = function(wrd, pttrn){
+			var word1 = "";
+			var word2 = "";
+			for (i=0; i < wrd.length; i++) {
+				if (pttrn[i] === "x") {
+					word1 += wrd[i];
+					word2 += " ";
+				} else if (pttrn[i] === "o") {
+					word1 += " ";
+					word2 += wrd[i];
+				}
+			}
+			return [word1, word2];
+		};
+			
+		if (word.length === 5) {
+			pattern = five[utilities.randInt(0, five.length-1)];
+			split_word = parse(word, pattern);
+		} else if (word.length === 6) {
+			pattern = six[utilities.randInt(0, six.length-1)];
+			split_word = parse(word, pattern);
+		}
+		
+		return split_word;
+	},
+	
+	living : [
+		"zebra",  "donkey", "shrimp", "turkey", "tiger",  "horse",
+		"monkey", "rabbit", "eagle",  "beaver", "animal", "woman",
+		"kitten", "shark",  "snake",  "birds",  "daisy",  "people",
+		"whale",  "lizard", "goose",  "snail",  "grass",  "child",
+		"puppy",  "human",  "parrot", "squid",  "trees",  "doggy",
+		"goats",  "sheep",  "mouse",  "rhino",  "lions",  "bears",
+		"worms",  "ducks",  "wolves", "walrus", "insect", "beetle",
+		"turtle", "frogs",  "panda",  "moose",  "oyster", "poodle",
+		"jaguar", "crabs",  "koala",  "llama",  "gopher", "clams",
+		"gerbil", "falcon", "toads",  "cattle", "hyena",  "bobcat",
+		"spider", "baboon", "badger", "coyote", "camel",
+	],	
+	
+	not_living : [
+		"pillow", "table",  "towel",  "shoes",  "knife",  "music",
+		"phone",  "paper",  "couch",  "socks",  "plate",  "radio",
+		"clock",  "pencil", "teapot", "shirt",  "napkin", "butter",
+		"chair",  "candle", "hammer", "pants",  "water",  "cookie",
+		"bottle", "truck",  "string", "spoon",  "boats",  "cream",
+		"staple", "school", "sphere", "jacket", "steam",  "fridge",
+		"cycle",  "ticket",
+	],
 };

@@ -1,6 +1,6 @@
 //TODO: load sounds and images
 
-Load = game_manager.new_scene("load");
+var Load = game_manager.new_scene("load");
 
 Load.entered = function() {
 	this.get_html_elements();

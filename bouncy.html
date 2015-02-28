@@ -81,18 +81,18 @@
 				<button id="cal_rb_button" type="button"><div class="rb_button"></div></button>
 				<button id="cal_pt_button" type="button"><div class="pt_button"></div></button>
 				<button id="cal_rg_button" type="button"><div class="rg_button"></div></button>
-				<div id="cal_dialog" title="Calibrate" class="hidden">
-					<div class="column_center">				
-						<div class="column_center">
-							<div>Look through the <span id="calib_span"></span> lens.</div>
-							<div>Adjust the slider until the squares disappear.</div>
-						</div>
-						<div class="column_center">
-							<canvas id="cal_canvas" width=400 height=72></canvas>
-							<div id="calib_slider"></div>
-						</div>
-						<button id="cal_button" type="button"></button>
+			</div>
+			<div id="cal_dialog" title="Calibrate" class="column_center hidden">
+				<div class="column_center">				
+					<div class="column_center">
+						<div>Look through the <span id="calib_span"></span> lens.</div>
+						<div>Adjust the slider until the squares disappear.</div>
 					</div>
+					<div class="column_center">
+						<canvas id="cal_canvas" width=400 height=72></canvas>
+						<div id="calib_slider"></div>
+					</div>
+					<button id="cal_button" type="button"></button>
 				</div>
 			</div>
 			<div id="level" class="hidden column_center">
@@ -122,7 +122,12 @@
 		</div>
 		<script>
 			$(document).ready(function(){
-				game_manager.start("load",TICKS);
+				game_manager.start("load",TICKS, function(){
+					$.widget( "ui.minute_spinner", $.ui.spinner, {
+						_format: function(value) { return value + ' min'; },
+						_parse: function(value) { return parseInt(value); }
+					});				
+				});
 			});
 		</script>
 	</body>

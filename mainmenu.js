@@ -1,4 +1,4 @@
-MainMenu = game_manager.new_scene("main_menu");
+var MainMenu = game_manager.new_scene("main_menu");
 
 MainMenu.entered = function() {
 	this.get_html_elements();
@@ -24,12 +24,12 @@ MainMenu.get_html_elements = function() {
 
 MainMenu.bind_events = function() {
 	this.start_button.bind("click", function(){
-		game.state_manager.push_state("level");			
+		game_manager.push_scene("level");			
 	});
 	this.options_button.bind("click", function(){
-		game.state_manager.push_state("options_menu");
+		game_manager.push_scene("options_menu");
 	});
 	this.calibrate_button.bind("click", function(){
-		game.state_manager.push_state("calibrate_menu");
+		game_manager.push_scene("calibrate_menu");
 	});
 };
