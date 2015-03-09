@@ -6,13 +6,13 @@ var i = 0;
 var TICKS = 60;
 var GRAY = [127,127,127];
 var BLUE = [0,0,255];
-var ORB_FONT_SIZE = 8;
-var ORB_FONT = "monaco, Lucida Console, monospace";
 var ORB_WIDTH = 50;
 var ORB_LINE_WIDTH = 2;
-var ORB_IRIS_WIDTH = 20;
-var ORB_IRIS_LINE_WIDTH = 3;
-var ORB_PUPIL_WIDTH = 4;
+
+var ORB_SEGMENT_LENGTH = 10;
+var ORB_SEGMENT_WIDTH = 3;
+var ORB_SEGMENT_LINE_WIDTH = 1;
+
 var ORB_SPEED_STEP = 20;
 var ORB_SCALE_STEP = 15;
 var ORB_ROTATION_SPEED = 90; //degrees per second
